@@ -1,0 +1,15 @@
+Name: teamCEstNotreProjet
+IconPath: MyTeam.png
+SoundPath: MyTeam.wav
+Description: |
+    Parce que c est notre projet !!!! (on voit pas les gilets jaunes)
+BrainsPackage: teamCEstNotreProjet
+AgentsBrainClasses:
+    WarBase: WarBaseBrainController
+    WarExplorer: WarExplorerBrainController
+    WarLight: WarLightBrainController
+    WarHeavy: WarHeavyBrainController
+    WarRocketLauncher: WarRocketLauncherBrainController
+    WarKamikaze: WarKamikazeBrainController
+    WarEngineer: WarEngineerBrainController
+    WarTurret: WarTurretBrainController
