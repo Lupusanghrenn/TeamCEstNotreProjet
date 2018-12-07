@@ -29,6 +29,13 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 		// Develop behaviour here
     	this.sp = new Sorted_Percepts(this.getPercepts(),this.getTeamName());
 		
+    	
+    	//a enlever plus tard 
+
+    	
+
+    	
+    	
 		String toReturn = ctask.exec(this);   // le run de la FSM
 		
 		if(toReturn == null){
@@ -103,6 +110,20 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 				
 			}
 			
+	    	if(!me.sp.getEnnemies().isEmpty())
+	    	{
+		    	//me.setDebugString(me.sp.getEnnemies().get(0).toString());
+		    	for(int i=0; i<me.sp.getEnnemies().size();i++)
+		    	{
+		    		if(!me.sp.getEnnemies().isEmpty())
+		    		{
+		    			String msgcnt = Double.toString(me.sp.getEnnemies().get(0).getDistance());
+		    			String msgcnt1=	Double.toString(me.sp.getEnnemies().get(0).getAngle());
+		    			me.broadcastMessageToAll( ContenuMessage.TargetSpotted.toString(), msgcnt,msgcnt1 );
+		    		}
+		    	}
+	    	}
+			
 			if(me.isBagFull()){
 				me.ctask = returnFoodTask;
 				return(null);
@@ -111,8 +132,8 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 			if(me.isBlocked())
 				me.setRandomHeading();
 			
-			me.setDebugStringColor(Color.BLACK);
-			me.setDebugString("Searching food");
+			//me.setDebugStringColor(Color.BLACK);
+			//me.setDebugString("Searching food");
 			
 			WarAgentPercept foodPercept = me.sp.getClosestRessources();
 			WarAgentPercept targetRL = me.sp.getTargetForRL();
