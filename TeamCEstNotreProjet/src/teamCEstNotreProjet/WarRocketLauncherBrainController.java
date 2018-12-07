@@ -61,6 +61,7 @@ public abstract class WarRocketLauncherBrainController extends WarRocketLauncher
 //          {
             PolarCoordinates target = me.getTargetedAgentPosition(message.getAngle(), message.getDistance(), Double.parseDouble(message.getContent()[0]),Double.parseDouble(message.getContent()[1]));
             me.setHeading(target.getAngle());
+            me.setTargetDistance(target.getDistance());
             if(me.isReloaded()) //si il est rechargé, il tire
             {
                 return WarRocketLauncher.ACTION_FIRE;
@@ -100,24 +101,13 @@ public abstract class WarRocketLauncherBrainController extends WarRocketLauncher
         {
             WarRocketLauncherBrainController me = (WarRocketLauncherBrainController) bc;
             int numMessage = me.getMessageAboutClosestEnemy(); // sinon  un ennemi a été repéré mais ne peut pas etre touché?
-//          if(numMessage!=-1) // c'est oui
-//          {
+
             WarMessage message = me.getMessages().get(numMessage);
             double targetDistance =Double.parseDouble(message.getContent()[0]);
             double targetAngle= Double.parseDouble(message.getContent()[1]);
-            if(targetDistance<0) // il doit reculer
-            {
-                me.setHeading(targetAngle+180);
-                return WarRocketLauncher.ACTION_MOVE;
-            }
-            else // il doit avancer
-            {
-                me.setHeading(targetAngle);
-                return WarRocketLauncher.ACTION_MOVE;
-            }
-            //}
-            
-            //return WarRocketLauncher.ACTION_IDLE;
+
+            me.setHeading(targetAngle);
+            return WarRocketLauncher.ACTION_MOVE;
         }
     };
     
