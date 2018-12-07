@@ -21,6 +21,7 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 	WTask ctask;
 	Sorted_Percepts sp;
 	String target;
+	int nbTick;
 	
 	@Override
 	public String action() {
@@ -39,10 +40,6 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 		}
 	}
 	
-	static WTask handleMsgs = new WTask(){ 
-		String exec(WarBrain bc){return "";}
-	};
-	
 	static WTask returnFoodTask = new WTask(){
 		String exec(WarBrain bc){
 			WarExplorerBrainController me = (WarExplorerBrainController) bc;
@@ -59,6 +56,7 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 			if(me.isBlocked()){
 				me.setRandomHeading();
 				me.target="none";
+				return WarExplorer.ACTION_MOVE;
 			}
 
 			if(me.target.equals("base") && me.getNbElementsInBag()>0){
@@ -67,7 +65,6 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 	    		}
 	    		if(me.sp.getBases().size()>0 && me.sp.getBases().get(0).getDistance()<me.MAX_DISTANCE_GIVE){
 	    			//set agent to give
-	    			System.out.println("Je give");
 	    			me.setDebugString("Je give");
 	    			me.setIdNextAgentToGive(me.sp.getBases().get(0).getID());
 	    			return WarExplorer.ACTION_GIVE;
@@ -83,7 +80,6 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 	    	
 	    	WarMessage m = me.getMessageFromBase();
 	    	if(m!=null){
-	    		System.out.println("Message recu");
 	    		me.target="base";
 	    		me.setHeading(m.getAngle());
 	    		return WarExplorer.ACTION_MOVE;
@@ -119,12 +115,26 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 			me.setDebugString("Searching food");
 			
 			WarAgentPercept foodPercept = me.sp.getClosestRessources();
+			WarAgentPercept targetRL = me.sp.getTargetForRL();
+			WarAgentPercept targetHeavy = me.sp.getTargetForHeavy();
+			
+			if(targetRL!=null) {
+				me.setHeading(targetRL.getAngle()+180);
+				me.broadcastMessageToAgentType(WarAgentType.WarRocketLauncher, ContenuMessage.EnnemyBaseFound.toString(), String.valueOf(targetRL.getDistance()),String.valueOf(targetRL.getAngle()),targetRL.getType().toString());
+				//gerer autre envoi de message
+			}
+			
+			if(targetHeavy!=null) {
+				me.setHeading(targetHeavy.getAngle()+180);
+				me.broadcastMessageToAgentType(WarAgentType.WarHeavy, ContenuMessage.EnnemyBaseFound.toString(), String.valueOf(targetHeavy.getDistance()),String.valueOf(targetHeavy.getAngle()),targetRL.getType().toString());
+				//gerer autre envoi de message
+			}
 			
 			//Si il y a de la nouriture
 			if(foodPercept != null){
-				me.broadcastMessageToAgentType(WarAgentType.WarExplorer, ContenuMessage.FoundFood.toString(), String.valueOf(foodPercept.getDistance()),String.valueOf(foodPercept.getAngle()));
+				me.broadcastMessageToAgentType(WarAgentType.WarExplorer, ContenuMessage.FoundFood.toString(), String.valueOf(foodPercept.getDistance()),String.valueOf(foodPercept.getAngle()),foodPercept.getType().toString());
 				if(me.sp.getRessources().size()>=5){
-					me.broadcastMessageToAgentType(WarAgentType.WarEngineer, ContenuMessage.FoundFood.toString(), String.valueOf(foodPercept.getDistance()),String.valueOf(foodPercept.getAngle()));
+					me.broadcastMessageToAgentType(WarAgentType.WarEngineer, ContenuMessage.FoundFood.toString(), String.valueOf(foodPercept.getDistance()),String.valueOf(foodPercept.getAngle()),foodPercept.getType().toString());
 				}
 				if(foodPercept.getDistance() > WarResource.MAX_DISTANCE_TAKE){
 					me.setHeading(foodPercept.getAngle());
@@ -147,39 +157,84 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 		}
 	};
 	
+	static WTask kittingEnnemy = new WTask(){
+		String exec(WarBrain bc){
+			WarExplorerBrainController me = (WarExplorerBrainController) bc;
+			me.setDebugString("Kitting");
+			me.nbTick--;
+			if(me.nbTick==0) {
+				me.setHeading(me.getHeading()+180);
+				me.ctask=searchEnnemyBase;
+			}
+			
+			//pas de gestion des blocage, vaut mieux etre dans le mur que perdre la cible
+			
+			return WarExplorer.ACTION_MOVE;
+			
+		}
+	};
+	
 	static WTask searchEnnemyBase = new WTask(){
 		String exec(WarBrain bc){
 			WarExplorerBrainController me = (WarExplorerBrainController) bc;
-			if(me.target.equals("none")) {
-				//Attente des messages
-				WarMessage m = me.getMessageAboutFood();
-				if(m!=null){
-					me.setHeading(m.getAngle());
-					me.target="searching";
-				}
-				return WarExplorer.ACTION_MOVE;//or move just in case ?
-			}else if(me.target.equals("searching")) {
-				//recherche d ennemi
-				//Sorted_Percepts sp = new Sorted_Percepts(me.getPercepts(),me.getTeamName());
-				WarAgentPercept p = me.sp.getClosestBaseThenEnnemi();
-				
-				if(me.isBlocked()){
-					me.setRandomHeading();
-					me.target="none";
-				}
-				if(p!=null) {
-					me.setHeading(p.getAngle());
-					me.broadcastMessageToAgentType(WarAgentType.WarEngineer, ContenuMessage.EnnemyBaseFound.toString(), String.valueOf(p.getDistance()),String.valueOf(p.getAngle()));
-					me.broadcastMessageToAgentType(WarAgentType.WarRocketLauncher, ContenuMessage.EnnemyBaseFound.toString(), String.valueOf(p.getDistance()),String.valueOf(p.getAngle()));
-					//gerer autre envoi de message
-					return WarExplorer.ACTION_MOVE;
-				}
-				
-				return WarExplorer.ACTION_MOVE;
-				
+			me.setDebugStringColor(Color.BLACK);
+			me.setDebugString("searchEnnemyBase");
+			
+			//recherche d ennemi
+			WarAgentPercept targetRL = me.sp.getTargetForRL();
+			WarAgentPercept targetHeavy = me.sp.getTargetForHeavy();
+			
+			if(me.isBlocked()){
+				me.setRandomHeading();
 			}
 			
-			return "";
+			if(targetRL!=null) {
+				me.setHeading(targetRL.getAngle()+180);
+				me.ctask=kittingEnnemy;
+				me.nbTick=20;
+				me.broadcastMessageToAgentType(WarAgentType.WarRocketLauncher, ContenuMessage.EnnemyBaseFound.toString(), String.valueOf(targetRL.getDistance()),String.valueOf(targetRL.getAngle()),targetRL.getType().toString());
+				//gerer autre envoi de message
+			}
+			
+			if(targetHeavy!=null) {
+				me.setHeading(targetHeavy.getAngle()+180);
+				me.ctask=kittingEnnemy;
+				me.nbTick=20;
+				me.broadcastMessageToAgentType(WarAgentType.WarHeavy, ContenuMessage.EnnemyBaseFound.toString(), String.valueOf(targetHeavy.getDistance()),String.valueOf(targetHeavy.getAngle()),targetHeavy.getType().toString());
+				//gerer autre envoi de message
+			}
+			
+			
+			//Attente des messages
+			WarMessage m = me.getMessageAboutBase();
+			if(m!=null) {
+				System.out.println("ExplorerWar : Message recu!");
+				PolarCoordinates pc = me.getTargetedAgentPosition(m.getAngle(), m.getDistance(), Double.parseDouble(m.getContent()[0]), Double.parseDouble(m.getContent()[1]));
+				me.setHeading(pc.getAngle());
+				me.target="searching";
+				return WarExplorer.ACTION_MOVE;
+			}
+			
+			return WarExplorer.ACTION_MOVE;
+			
+		}
+	};
+	
+	static WTask chooseRole = new WTask(){
+		String exec(WarBrain bc){
+			WarExplorerBrainController me = (WarExplorerBrainController) bc;
+			me.requestRole("Explorer","ExplorerFood");
+			int nbInRole = me.getNumberOfAgentsInRole("Explorer","ExplorerFood");
+			if(nbInRole>4) {
+				//5 exploreurs de bouffe et apres que des war
+				me.leaveRole("Explorer", "ExplorerFood");
+				me.requestRole("Explorer", "ExplorerWar");
+				me.ctask=searchEnnemyBase;
+				System.out.println("Je suis un warExplorer");
+			}else {
+				me.ctask=getFoodTask;
+			}
+			return me.ctask.exec(me);
 			
 		}
 	};
@@ -188,17 +243,25 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 	
 	public WarExplorerBrainController() {
 		super();
-		ctask = getFoodTask; // initialisation de la FSM
+		ctask = chooseRole; // initialisation de la FSM
 		target="start";
+		nbTick=0;
 		//si role = war explorer --> target="none"
-	}
-
-    
+		
+	}   
 		
 	
 	private WarMessage getMessageAboutFood() {
 		for (WarMessage m : getMessages()) {
 			if(m.getMessage().equals(ContenuMessage.FoundFood.toString()))
+				return m;
+		}
+		return null;
+	}
+	
+	private WarMessage getMessageAboutBase() {
+		for (WarMessage m : getMessages()) {
+			if(m.getMessage().equals(ContenuMessage.EnnemyBaseFound.toString()))
 				return m;
 		}
 		return null;
