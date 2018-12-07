@@ -50,7 +50,7 @@ public abstract class WarTurretBrainController extends WarTurretBrain {
         Sorted_Percepts sp = new Sorted_Percepts(getPercepts(),this.getTeamName());
         
 
-        WarAgentPercept p = sp.getClosestRocketThenEnnemi();//priorise les rockets
+        WarAgentPercept p = sp.getClosestEnnemi();//priorise les rockets
         if(p==null)
         {
             _sight += 90;
@@ -60,21 +60,22 @@ public abstract class WarTurretBrainController extends WarTurretBrain {
             setHeading(_sight);
         }
         
-        else if(p!=null && isEnemy(p) && oldPercept!=null){ //Tour de detection
-            if(p.getAngle()==oldPercept.getAngle() && p.getDistance()==oldPercept.getDistance()) {
-                double angle = setHeadingRocket(p,WarRocket.SPEED);
-                
-                
-                //ennemi is idle --> besoin de getDistance() ???
-                this.setHeading(angle);
-                
-                //this.setHeading(p.getAngle());
-                if (isReloaded()) {
-                  return WarTurret.ACTION_FIRE;
-                } else{
-                  return WarTurret.ACTION_RELOAD;
-                }
-            }else {
+//        else if(p!=null && isEnemy(p) && oldPercept!=null){ //Tour de detection
+//            if(p.getAngle()==oldPercept.getAngle() && p.getDistance()==oldPercept.getDistance()) {
+//                double angle = setHeadingRocket(p,WarRocket.SPEED);
+//                
+//                
+//                //ennemi is idle --> besoin de getDistance() ???
+//                this.setHeading(angle);
+//                
+//                //this.setHeading(p.getAngle());
+//                if (isReloaded()) {
+//                  return WarTurret.ACTION_FIRE;
+//                } else{
+//                  return WarTurret.ACTION_RELOAD;
+//                }
+//            }
+        else {
                 //double ratio = 2.0*(p.getDistance()/50d);
                 double speed=this.defaultSpeed;
                 if(this.speedByAgentType.containsKey(p.getType())) {
@@ -99,7 +100,7 @@ public abstract class WarTurretBrainController extends WarTurretBrain {
                 }
                     } 
             }
-        }
+        //}
         oldPercept=p;//Tour de detection
         return WarTurret.ACTION_IDLE;
         
