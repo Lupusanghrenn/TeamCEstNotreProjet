@@ -129,11 +129,11 @@ public abstract class WarTurretBrainController extends WarTurretBrain {
             {       
                 targetDistance=blub.getDistance();
                 angle=blub.getAngle();
-                if(blub.getDistance()<WarShell.SPEED)
+                if((blub.getDistance()<WarShell.SPEED&&i==0)||p.getType()==WarAgentType.WarTurret||p.getType()==WarAgentType.WarBase)
                 {
                     return p.getAngle();
                 }
-                if(blub.getDistance()/WarShell.SPEED==i)
+                if((int)blub.getDistance()/(int)WarShell.SPEED==i)
                 {
                     String dbgmsg = Double.toString(angle);
                     this.setDebugString(dbgmsg);

@@ -32,7 +32,9 @@ public abstract class WarRocketLauncherBrainController extends WarRocketLauncher
     @Override
     public String action() {
 
+    	this.sp = new Sorted_Percepts(this.getPercepts(),this.getTeamName());
 
+    	this.setDebugString(sp.getEnnemies().toString());
 
         String toReturn = ctask.exec(this);   // le run de la FSM
         
@@ -50,6 +52,22 @@ public abstract class WarRocketLauncherBrainController extends WarRocketLauncher
         {
         	WarRocketLauncherBrainController me = (WarRocketLauncherBrainController) bc;
     		
+        	if(!me.sp.getEnnemies().isEmpty())
+            {
+            	me.hasTarget=true;
+    			me.cptrTarget=me.nbTickBeforeAbandon;
+                me.targetDirection = new PolarCoordinates(me.sp.getEnnemies().get(0).getDistance(),me.sp.getEnnemies().get(0).getAngle());
+            
+	            me.setHeading(me.targetDirection.getAngle());
+	            me.setTargetDistance(me.targetDirection.getDistance());
+	            if(me.isReloaded()) //si il est rechargé, il tire
+	            {
+	                return WarRocketLauncherBrainController.ACTION_FIRE;
+	            }              	     		                      	
+	            return WarRocketLauncherBrainController.ACTION_RELOAD;          
+	            
+            }
+        	
             WarMessage message= me.getMessageAboutEnemiesInRange();
             if(message==null)
             {
@@ -73,8 +91,7 @@ public abstract class WarRocketLauncherBrainController extends WarRocketLauncher
             	me.ctask = MoveToExplorer;
             }
             if(!me.isReloaded())
-            {   
-            	     		           
+            {        		           
             	return WarRocketLauncherBrainController.ACTION_RELOAD;          
             }
             return WarRocketLauncherBrainController.ACTION_MOVE;     
@@ -88,16 +105,25 @@ public abstract class WarRocketLauncherBrainController extends WarRocketLauncher
         	
         	WarRocketLauncherBrainController me = (WarRocketLauncherBrainController) bc;
            
+         	if(!me.sp.getEnnemies().isEmpty())
+        	{
+        		me.hasTarget=true;
+        		me.cptrTarget=me.nbTickBeforeAbandon;
+                me.ctask=ShootTarget;
+        		me.hasTarget=true;
+            	return WarRocketLauncherBrainController.ACTION_MOVE;
+        	}
         	WarMessage message= me.getMessageAboutEnemiesInRange();    //detecte si des ennemis sont a portée de rocket
             if(message!=null)
             {
         		me.hasTarget=true;
         		me.cptrTarget=me.nbTickBeforeAbandon;
-            	me.setDebugString(message.getContent().toString());
                 me.ctask=ShootTarget;
         		me.hasTarget=true;
+            	return WarRocketLauncherBrainController.ACTION_MOVE;
+
             }
-            else if(me.getMessageAboutClosestEnemy()!=-1)
+            if(me.getMessageAboutClosestEnemy()!=-1)
         	{
         		int numMessage = me.getMessageAboutClosestEnemy(); // sinon  un ennemi a été repéré mais ne peut pas etre touché?
         		WarMessage messageClosestEnemy = me.getMessages().get(numMessage);
@@ -111,7 +137,7 @@ public abstract class WarRocketLauncherBrainController extends WarRocketLauncher
                 me.setRandomHeading();
             	return WarRocketLauncherBrainController.ACTION_MOVE;
         	}
-        	else if(me.cptrTarget<=0)
+        	if(me.cptrTarget<=0)
         	{
         		me.ctask=MoveToExplorer;
         	}
@@ -128,6 +154,14 @@ public abstract class WarRocketLauncherBrainController extends WarRocketLauncher
         	WarRocketLauncherBrainController me = (WarRocketLauncherBrainController) bc;
             
             //}
+        	if(!me.sp.getEnnemies().isEmpty())
+        	{
+            	//me.setDebugString(message.getContent().toString());
+                me.ctask=ShootTarget;
+                me.setHeading(me.sp.getEnnemies().get(0).getAngle());
+                me.setTargetDistance(me.sp.getEnnemies().get(0).getDistance());
+                return WarHeavyBrainController.ACTION_FIRE;
+        	}
             WarMessage message= me.getMessageAboutEnemiesInRange();    //detecte si des ennemis sont a portée de rocket
             int numMessage = me.getMessageAboutClosestEnemy(); // sinon  un ennemi a été repéré mais ne peut pas etre touché?
             if(message!=null)

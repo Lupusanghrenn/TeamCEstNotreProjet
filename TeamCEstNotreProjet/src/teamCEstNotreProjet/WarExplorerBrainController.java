@@ -118,9 +118,10 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 		    	{
 		    		if(!me.sp.getEnnemies().isEmpty())
 		    		{
-		    			String msgcnt = Double.toString(me.sp.getEnnemies().get(0).getDistance());
-		    			String msgcnt1=	Double.toString(me.sp.getEnnemies().get(0).getAngle());
-		    			me.broadcastMessageToAll( ContenuMessage.TargetSpotted.toString(), msgcnt,msgcnt1 );
+		    			String msgcnt = Double.toString(me.sp.getClosestEnnemi().getDistance());
+		    			String msgcnt1=	Double.toString(me.sp.getClosestEnnemi().getAngle());
+		    			String msgcnt2 = me.sp.getClosestEnnemi().getType().toString();
+		    			me.broadcastMessageToAll( ContenuMessage.TargetSpotted.toString(), msgcnt,msgcnt1,msgcnt2 );
 		    		}
 		    	}
 	    	}

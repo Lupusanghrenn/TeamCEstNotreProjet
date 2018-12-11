@@ -1,10 +1,17 @@
 package teamCEstNotreProjet;
 
+import java.util.HashMap;
+
+import edu.warbot.agents.agents.WarEngineer;
 import edu.warbot.agents.agents.WarExplorer;
+import edu.warbot.agents.agents.WarHeavy;
+import edu.warbot.agents.agents.WarKamikaze;
+import edu.warbot.agents.agents.WarLight;
 import edu.warbot.agents.agents.WarRocketLauncher;
 import edu.warbot.agents.enums.WarAgentType;
 import edu.warbot.agents.percepts.WarAgentPercept;
 import edu.warbot.agents.projectiles.WarBomb;
+import edu.warbot.agents.projectiles.WarRocket;
 import edu.warbot.agents.projectiles.WarShell;
 import edu.warbot.brains.WarBrain;
 import edu.warbot.brains.brains.WarHeavyBrain;
@@ -24,9 +31,22 @@ public abstract class WarHeavyBrainController extends  WarHeavyBrain {
     int nbTickBeforeAbandon;
     PolarCoordinates targetDirection;
     double shellDistance=WarShell.AUTONOMY*WarShell.SPEED;
+    private HashMap<WarAgentType,Double> speedByAgentType;
+
 
     public WarHeavyBrainController() {
         super();
+        speedByAgentType = new HashMap<WarAgentType,Double>();
+        this.speedByAgentType.put(WarAgentType.WarEngineer, WarEngineer.SPEED);
+        this.speedByAgentType.put(WarAgentType.WarExplorer, WarExplorer.SPEED);
+        this.speedByAgentType.put(WarAgentType.Wall, 0d);
+        this.speedByAgentType.put(WarAgentType.WarBase, 0d);
+        this.speedByAgentType.put(WarAgentType.WarHeavy, WarHeavy.SPEED);
+        this.speedByAgentType.put(WarAgentType.WarKamikaze, WarKamikaze.SPEED);
+        this.speedByAgentType.put(WarAgentType.WarLight, WarLight.SPEED);
+        this.speedByAgentType.put(WarAgentType.WarRocketLauncher, WarRocketLauncher.SPEED);
+        this.speedByAgentType.put(WarAgentType.WarRocket, WarRocket.SPEED);
+        this.speedByAgentType.put(WarAgentType.WarTurret, 0d);
         ctask=MoveToExplorer;
         hasTarget =false;
         cptrTarget=0;
@@ -36,8 +56,8 @@ public abstract class WarHeavyBrainController extends  WarHeavyBrain {
     @Override
     public String action() {
 
-
-
+    	this.sp = new Sorted_Percepts(this.getPercepts(),this.getTeamName());
+    	this.setDebugString(sp.getEnnemies().toString());
         String toReturn = ctask.exec(this);   // le run de la FSM
         
         if(toReturn == null){
@@ -53,32 +73,71 @@ public abstract class WarHeavyBrainController extends  WarHeavyBrain {
         String exec(WarBrain bc)
         {
             WarHeavyBrainController me = (WarHeavyBrainController) bc;
-    		
+            if(me.sp.getClosestEnnemi()!=null)
+            { 	
+            	me.hasTarget=true;
+    			me.cptrTarget=me.nbTickBeforeAbandon;
+                me.targetDirection = new PolarCoordinates(me.sp.getClosestEnnemi().getDistance(),me.sp.getClosestEnnemi().getAngle());
+                for (int i=0;i<WarShell.AUTONOMY;i++)
+                {
+                    PolarCoordinates blub = me.getTargetedAgentPosition(me.targetDirection.getAngle(), me.targetDirection.getDistance(), me.sp.getClosestEnnemi().getHeading(), i*me.speedByAgentType.get(me.sp.getClosestEnnemi().getType()));
+                    if((blub.getDistance()<WarShell.SPEED&&i==0)||me.sp.getClosestEnnemi().getType()==WarAgentType.WarTurret||me.sp.getClosestEnnemi().getType()==WarAgentType.WarBase)
+                    {
+                        me.setHeading(me.targetDirection.getAngle());
+                        break;
+                    }
+                    if((int)blub.getDistance()/(int)WarShell.SPEED==i)
+                    {
+                        me.setHeading(blub.getAngle());
+                    }
+                }
+	            if(me.isReloaded()) //si il est rechargé, il tire
+	            {	
+	                return WarHeavyBrainController.ACTION_FIRE;
+	            }     		           
+	            return WarHeavyBrainController.ACTION_RELOAD;               
+            }
+            
             WarMessage message= me.getMessageAboutEnemiesInRange();
-            if(message==null)
+            if(message==null&&me.sp.getClosestEnnemi()==null)
             {
 	            me.cptrTarget--; 
             }
-            else
+            else if(message!=null)
             {
             	me.hasTarget=true;
     			me.cptrTarget=me.nbTickBeforeAbandon;
                 me.targetDirection = me.getTargetedAgentPosition(message.getAngle(), message.getDistance(), Double.parseDouble(message.getContent()[1]),Double.parseDouble(message.getContent()[0]));
+                for (int i=0;i<WarShell.AUTONOMY;i++)
+                {
+                    PolarCoordinates blub = me.getTargetedAgentPosition(me.targetDirection.getAngle(), me.targetDirection.getDistance(),Double.parseDouble(message.getContent()[1]) , i*me.speedByAgentType.get(WarAgentType.valueOf(message.getContent()[2])));
+                    if((blub.getDistance()<WarShell.SPEED&&i==0)||me.sp.getClosestEnnemi().getType()==WarAgentType.WarTurret||me.sp.getClosestEnnemi().getType()==WarAgentType.WarBase)
+                    {
+                        me.setHeading(me.targetDirection.getAngle());
+                        break;
+                    }
+                    me.setDebugString(Integer.toString((int)blub.getDistance()/(int)WarShell.SPEED));
+                    if((int)blub.getDistance()/(int)WarShell.SPEED==i)
+                    {
+                        me.setHeading(blub.getAngle());
+                    }
+                }
+	            if(me.isReloaded()) //si il est rechargé, il tire
+	            {	
+	                return WarHeavyBrainController.ACTION_FIRE;
+	            }     		           
+	            return WarHeavyBrainController.ACTION_RELOAD;  
             }
-            me.setHeading(me.targetDirection.getAngle());
-            if(me.isReloaded()) //si il est rechargé, il tire
+            //me.setHeading(me.targetDirection.getAngle());
+            if(!me.isReloaded()) //si il est rechargé, il tire
             {
-                return WarHeavyBrainController.ACTION_FIRE;
+                return WarHeavyBrainController.ACTION_RELOAD;
             }
             if(me.cptrTarget<=0)
             {
             	me.ctask = MoveToExplorer;
             }
-            if(!me.isReloaded())
-            {   
-            	     		           
-            	return WarHeavyBrainController.ACTION_RELOAD;          
-            }
+
             return WarHeavyBrainController.ACTION_MOVE;     
         }
         
@@ -89,17 +148,25 @@ public abstract class WarHeavyBrainController extends  WarHeavyBrain {
         {
         	
         	WarHeavyBrainController me = (WarHeavyBrainController) bc;
-           
+	
+        	if(me.sp.getClosestEnnemi()!=null)
+        	{
+        		me.hasTarget=true;
+        		me.cptrTarget=me.nbTickBeforeAbandon;
+                me.ctask=ShootTarget;
+        		me.hasTarget=true;
+            	return WarHeavyBrainController.ACTION_MOVE;
+        	}
         	WarMessage message= me.getMessageAboutEnemiesInRange();    //detecte si des ennemis sont a portée de rocket
             if(message!=null)
             {
         		me.hasTarget=true;
         		me.cptrTarget=me.nbTickBeforeAbandon;
-            	me.setDebugString(message.getContent().toString());
                 me.ctask=ShootTarget;
         		me.hasTarget=true;
+            	return WarHeavyBrainController.ACTION_MOVE;
             }
-            else if(me.getMessageAboutClosestEnemy()!=-1)
+            if(me.getMessageAboutClosestEnemy()!=-1)
         	{
         		int numMessage = me.getMessageAboutClosestEnemy(); // sinon  un ennemi a été repéré mais ne peut pas etre touché?
         		WarMessage messageClosestEnemy = me.getMessages().get(numMessage);
@@ -112,7 +179,7 @@ public abstract class WarHeavyBrainController extends  WarHeavyBrain {
                 me.setRandomHeading();
             	return WarHeavyBrainController.ACTION_MOVE;
         	}
-        	else if(me.cptrTarget<=0)
+        	if(me.cptrTarget<=0)
         	{
         		me.ctask=MoveToExplorer;
         	}
@@ -129,6 +196,13 @@ public abstract class WarHeavyBrainController extends  WarHeavyBrain {
         	WarHeavyBrainController me = (WarHeavyBrainController) bc;
             
             //}
+        	
+        	if(me.sp.getClosestEnnemi()!=null)
+        	{
+                me.ctask=ShootTarget;
+                me.setHeading(me.sp.getClosestEnnemi().getAngle());
+                return WarHeavyBrainController.ACTION_FIRE;
+        	}
             WarMessage message= me.getMessageAboutEnemiesInRange();    //detecte si des ennemis sont a portée de rocket
             int numMessage = me.getMessageAboutClosestEnemy(); // sinon  un ennemi a été repéré mais ne peut pas etre touché?
             if(message!=null)
@@ -154,7 +228,6 @@ public abstract class WarHeavyBrainController extends  WarHeavyBrain {
         {
             if(m.getMessage().equals(ContenuMessage.TargetSpotted.toString()))
             {
-            	setDebugString("coucou");
                 if(isTargetInRange(m))
                 {
                     return m ;
@@ -173,7 +246,6 @@ public abstract class WarHeavyBrainController extends  WarHeavyBrain {
 
             if(this.getMessages().get(i).getMessage().equals(ContenuMessage.TargetSpotted.toString()))
             {   
-            	setDebugString("hola");
                 PolarCoordinates blub=getTargetedAgentPosition(getMessages().get(i).getAngle(), getMessages().get(i).getDistance(), Double.parseDouble(getMessages().get(i).getContent()[1]),Double.parseDouble(getMessages().get(i).getContent()[0]));
 
                 if(Math.abs(blub.getDistance()-150)<previousDistance)
