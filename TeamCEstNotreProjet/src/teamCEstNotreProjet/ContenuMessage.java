@@ -8,5 +8,7 @@ public enum ContenuMessage {
 	GiveToAgent,
 	IMHere,
 	NoMoreFood,
-	TargetSpotted
+	TargetSpotted,
+	BaseUnderAttack,
+	FollowMissile
 }

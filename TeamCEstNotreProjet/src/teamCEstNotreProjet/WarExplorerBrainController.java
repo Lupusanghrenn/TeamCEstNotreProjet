@@ -133,8 +133,8 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 			if(me.isBlocked())
 				me.setRandomHeading();
 			
-			//me.setDebugStringColor(Color.BLACK);
-			//me.setDebugString("Searching food");
+			me.setDebugStringColor(Color.BLACK);
+			me.setDebugString("Searching food");
 			
 			WarAgentPercept foodPercept = me.sp.getClosestRessources();
 			WarAgentPercept targetRL = me.sp.getTargetForRL();
@@ -251,6 +251,19 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 				//5 exploreurs de bouffe et apres que des war
 				me.leaveRole(Group.WarExplorer.toString(), Role.WarExplorerFood.toString());
 				me.requestRole(Group.WarExplorer.toString(), Role.WarExplorerWar.toString());
+				
+				//on se met dans un groupe d assault
+				me.requestRole(Group.RocketLauncher.toString(), Role.RocketLauncher.toString());
+	        	
+	        	String str = "Assault";
+	        	int i=0;
+	        	int nb = me.getNumberOfAgentsInRole(str+i, Role.RocketLauncher.toString());
+	        	while(nb!=0) {
+	        		i++;
+	        		nb = me.getNumberOfAgentsInRole(str+i, Role.RocketLauncher.toString());
+	        	}
+	        	me.requestRole(str+i, Role.RocketLauncher.toString());
+	        		        	
 				me.ctask=searchEnnemyBase;
 				System.out.println("Je suis un ExplorerWar");
 			}else {

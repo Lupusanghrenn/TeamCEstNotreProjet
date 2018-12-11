@@ -27,7 +27,7 @@ public abstract class WarHeavyBrainController extends  WarHeavyBrain {
 
     public WarHeavyBrainController() {
         super();
-        ctask=MoveToExplorer;
+        ctask=chooseRole;
         hasTarget =false;
         cptrTarget=0;
         nbTickBeforeAbandon=20;
@@ -145,6 +145,29 @@ public abstract class WarHeavyBrainController extends  WarHeavyBrain {
             if (me.isBlocked())
                 me.setRandomHeading();
             return WarHeavyBrainController.ACTION_MOVE;
+        }
+    };
+    
+    static WTask chooseRole = new WTask(){
+        String exec(WarBrain bc)
+        {
+        	
+        	WarHeavyBrainController me = (WarHeavyBrainController) bc;
+           
+        	me.requestRole(Group.WarHeavy.toString(), Role.WarHeavy.toString());
+        	
+        	String str = "Assault";
+        	int i=0;
+        	int nb = me.getNumberOfAgentsInRole(str+i, Role.WarHeavy.toString());
+        	while(nb!=0) {
+        		i++;
+        		nb = me.getNumberOfAgentsInRole(str+i, Role.WarHeavy.toString());
+        	}
+        	me.requestRole(str+i, Role.WarHeavy.toString());
+        	
+        	me.ctask=MoveToExplorer;
+        	
+        	return me.ctask.exec(me);
         }
     };
     
