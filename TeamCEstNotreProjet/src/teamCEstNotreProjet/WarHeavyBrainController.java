@@ -150,21 +150,19 @@ public abstract class WarHeavyBrainController extends  WarHeavyBrain {
         	
         	WarHeavyBrainController me = (WarHeavyBrainController) bc;
 	
-        	if(me.sp.getClosestEnnemi()!=null)
-        	{
-        		me.hasTarget=true;
-        		me.cptrTarget=me.nbTickBeforeAbandon;
-                me.ctask=ShootTarget;
-        		me.hasTarget=true;
-            	return WarHeavyBrainController.ACTION_MOVE;
-        	}
+//        	if(me.sp.getClosestEnnemi()!=null)
+//        	{
+//        		me.hasTarget=true;
+//        		me.cptrTarget=me.nbTickBeforeAbandon;
+//                me.ctask=ShootTarget;
+//            	return WarHeavyBrainController.ACTION_MOVE;
+//        	}
         	WarMessage message= me.getMessageAboutEnemiesInRange();    //detecte si des ennemis sont a portée de rocket
-            if(message!=null)
+            if(message!=null||me.sp.getClosestEnnemi()!=null)
             {
         		me.hasTarget=true;
         		me.cptrTarget=me.nbTickBeforeAbandon;
                 me.ctask=ShootTarget;
-        		me.hasTarget=true;
             	return WarHeavyBrainController.ACTION_MOVE;
             }
             if(me.getMessageAboutClosestEnemy()!=-1)
@@ -209,6 +207,7 @@ public abstract class WarHeavyBrainController extends  WarHeavyBrain {
         	}
             WarMessage message= me.getMessageAboutEnemiesInRange();    //detecte si des ennemis sont a portée de rocket
             int numMessage = me.getMessageAboutClosestEnemy(); // sinon  un ennemi a été repéré mais ne peut pas etre touché?
+            me.setDebugString(Integer.toString(numMessage));
             if(message!=null)
             {
             	me.setDebugString(message.getContent().toString());
