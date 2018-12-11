@@ -21,6 +21,7 @@ public abstract class WarBaseBrainController extends WarBaseBrain {
     public WarBaseBrainController() {
         super();
         _inDanger = false;
+        this.ctask=firstTick;
     }
     
     @Override
@@ -43,6 +44,14 @@ public abstract class WarBaseBrainController extends WarBaseBrain {
     static WTask firstTick = new WTask(){
 		String exec(WarBrain bc){
 			WarBaseBrainController me = (WarBaseBrainController) bc;
+			
+			//Ajout dans les differents role
+			me.requestRole(Group.Base.toString(), Role.Base.toString());
+			me.requestRole(Group.WarExplorer.toString(), Role.Base.toString());
+			me.requestRole(Group.RocketLauncher.toString(), Role.Base.toString());
+			me.requestRole(Group.WarHeavy.toString(), Role.Base.toString());
+			
+			//Creation d un explorer
 			me.setNextAgentToCreate(WarAgentType.WarEngineer);
 			me.ctask=defaultTask;
             return WarBase.ACTION_CREATE;            

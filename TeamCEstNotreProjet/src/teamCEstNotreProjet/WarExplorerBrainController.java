@@ -245,14 +245,14 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 	static WTask chooseRole = new WTask(){
 		String exec(WarBrain bc){
 			WarExplorerBrainController me = (WarExplorerBrainController) bc;
-			me.requestRole("Explorer","ExplorerFood");
-			int nbInRole = me.getNumberOfAgentsInRole("Explorer","ExplorerFood");
+			me.requestRole(Group.WarExplorer.toString(),"ExplorerFood");
+			int nbInRole = me.getNumberOfAgentsInRole(Group.WarExplorer.toString(),Role.WarExplorerFood.toString());
 			if(nbInRole>4) {
 				//5 exploreurs de bouffe et apres que des war
-				me.leaveRole("Explorer", "ExplorerFood");
-				me.requestRole("Explorer", "ExplorerWar");
+				me.leaveRole(Group.WarExplorer.toString(), Role.WarExplorerFood.toString());
+				me.requestRole(Group.WarExplorer.toString(), Role.WarExplorerWar.toString());
 				me.ctask=searchEnnemyBase;
-				System.out.println("Je suis un warExplorer");
+				System.out.println("Je suis un ExplorerWar");
 			}else {
 				me.ctask=getFoodTask;
 			}
