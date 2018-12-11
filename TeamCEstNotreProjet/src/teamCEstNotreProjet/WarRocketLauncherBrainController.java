@@ -25,7 +25,7 @@ public abstract class WarRocketLauncherBrainController extends WarRocketLauncher
 
     public WarRocketLauncherBrainController() {
         super();
-        ctask=MoveToExplorer;
+        ctask=chooseRole;
 		//this.requestRole(Group.RocketLauncher.toString(),Role.RocketLauncher.toString());
     }
 
@@ -179,6 +179,29 @@ public abstract class WarRocketLauncherBrainController extends WarRocketLauncher
             if (me.isBlocked())
                 me.setRandomHeading();
             return WarRocketLauncherBrainController.ACTION_MOVE;
+        }
+    };
+    
+    static WTask chooseRole = new WTask(){
+        String exec(WarBrain bc)
+        {
+        	
+        	WarRocketLauncherBrainController me = (WarRocketLauncherBrainController) bc;
+           
+        	me.requestRole(Group.RocketLauncher.toString(), Role.RocketLauncher.toString());
+        	
+        	String str = "Assault";
+        	int i=0;
+        	int nb = me.getNumberOfAgentsInRole(str+i, Role.RocketLauncher.toString());
+        	while(nb!=0) {
+        		i++;
+        		nb = me.getNumberOfAgentsInRole(str+i, Role.RocketLauncher.toString());
+        	}
+        	me.requestRole(str+i, Role.RocketLauncher.toString());
+        	
+        	me.ctask=MoveToExplorer;
+        	
+        	return me.ctask.exec(me);
         }
     };
     

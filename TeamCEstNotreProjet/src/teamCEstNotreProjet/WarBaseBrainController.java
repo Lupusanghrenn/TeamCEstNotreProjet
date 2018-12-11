@@ -9,6 +9,7 @@ import edu.warbot.brains.WarBrain;
 import edu.warbot.brains.brains.WarBaseBrain;
 import edu.warbot.communications.WarMessage;
 
+import java.util.HashMap;
 import java.util.List;
 
 public abstract class WarBaseBrainController extends WarBaseBrain {
@@ -17,11 +18,18 @@ public abstract class WarBaseBrainController extends WarBaseBrain {
     
     public WTask ctask;
     Sorted_Percepts sp;
+    HashMap<Group,Integer> nbAgentPerGroup;
+    HashMap<Group,Integer> desiredNbAgentPerRole;
 
     public WarBaseBrainController() {
         super();
         _inDanger = false;
         this.ctask=firstTick;
+        //init de la hasmMap
+        nbAgentPerGroup = new HashMap<Group,Integer>();
+        for(Group g : Group.values()) {
+        	nbAgentPerGroup.put(g, 0);
+        }
     }
     
     @Override
@@ -45,13 +53,13 @@ public abstract class WarBaseBrainController extends WarBaseBrain {
 		String exec(WarBrain bc){
 			WarBaseBrainController me = (WarBaseBrainController) bc;
 			
-			//Ajout dans les differents role
-			me.requestRole(Group.Base.toString(), Role.Base.toString());
+			//Ajout dans les differents role -- USELESS
+			/*me.requestRole(Group.Base.toString(), Role.Base.toString());
 			me.requestRole(Group.WarExplorer.toString(), Role.Base.toString());
 			me.requestRole(Group.RocketLauncher.toString(), Role.Base.toString());
-			me.requestRole(Group.WarHeavy.toString(), Role.Base.toString());
+			me.requestRole(Group.WarHeavy.toString(), Role.Base.toString());*/
 			
-			//Creation d un explorer
+			//Creation d un ingenieur
 			me.setNextAgentToCreate(WarAgentType.WarEngineer);
 			me.ctask=defaultTask;
             return WarBase.ACTION_CREATE;            
@@ -114,8 +122,13 @@ public abstract class WarBaseBrainController extends WarBaseBrain {
 			//TODO
 			if(me.sp.getClosestRocket()!=null) {
 				//on priorise les rocket
+				WarAgentPercept p = me.sp.getClosestRocket();
+				me.broadcastMessageToAgentType(WarAgentType.WarHeavy, ContenuMessage.FollowMissile.toString(), String.valueOf(p.getDistance()),String.valueOf(p.getAngle()),String.valueOf(p.getHeading()+180));
+				me.broadcastMessageToAgentType(WarAgentType.WarLight, ContenuMessage.FollowMissile.toString(), String.valueOf(p.getDistance()),String.valueOf(p.getAngle()),String.valueOf(p.getHeading()+180));
 			}else if(me.sp.getClosestEnnemi()!=null) {
-				
+				WarAgentPercept p = me.sp.getClosestEnnemi();
+				me.broadcastMessageToAgentType(WarAgentType.WarHeavy, ContenuMessage.BaseUnderAttack.toString(), String.valueOf(p.getDistance()),String.valueOf(p.getAngle()));
+				me.broadcastMessageToAgentType(WarAgentType.WarLight, ContenuMessage.BaseUnderAttack.toString(), String.valueOf(p.getDistance()),String.valueOf(p.getAngle()));
 			}else {
 				//plus d ennemi
 				me.ctask=defaultTask;
@@ -125,7 +138,14 @@ public abstract class WarBaseBrainController extends WarBaseBrain {
     };
     
     private void updateAgentInGroup() {
-    	//TODO
+    	//Mis a jour de la hashMap
+    	for(Group g : Group.values()) {
+    		int nb = 0;
+    		for(Role r :Role.values()) {
+    			nb+=this.getNumberOfAgentsInRole(g.toString(), r.toString());
+    		}
+    		this.nbAgentPerGroup.put(g, nb);    		   		
+    	}
     }
 
 }
