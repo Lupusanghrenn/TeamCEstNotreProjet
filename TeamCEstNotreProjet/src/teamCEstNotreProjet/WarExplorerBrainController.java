@@ -246,10 +246,11 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 	static WTask chooseRole = new WTask(){
 		String exec(WarBrain bc){
 			WarExplorerBrainController me = (WarExplorerBrainController) bc;
-			int nbInRole = me.getNumberOfAgentsInRole(Group.WarExplorer.toString(),Role.WarExplorerFood.toString());
+			me.requestRole(WarAgentType.WarExplorer.toString(), WarAgentType.WarExplorer.toString());
+			int nbInRole = me.getNumberOfAgentsInRole(WarAgentType.WarExplorer.toString(),Role.WarExplorerFood.toString());
 			if(nbInRole>4) {
 				//5 exploreurs de bouffe et apres que des war
-				me.requestRole(Group.WarExplorer.toString(), Role.WarExplorerWar.toString());
+				me.requestRole(WarAgentType.WarExplorer.toString(), Role.WarExplorerWar.toString());
 				
 				//on se met dans un groupe d assault
 	        	String str = "Assault";

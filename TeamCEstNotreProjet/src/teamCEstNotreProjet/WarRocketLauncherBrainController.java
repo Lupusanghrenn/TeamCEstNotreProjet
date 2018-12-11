@@ -188,16 +188,16 @@ public abstract class WarRocketLauncherBrainController extends WarRocketLauncher
         	
         	WarRocketLauncherBrainController me = (WarRocketLauncherBrainController) bc;
            
-        	me.requestRole(Group.RocketLauncher.toString(), Role.RocketLauncher.toString());
+        	me.requestRole(WarAgentType.WarRocketLauncher.toString(), WarAgentType.WarRocketLauncher.toString());
         	
         	String str = "Assault";
         	int i=0;
-        	int nb = me.getNumberOfAgentsInRole(str+i, Role.RocketLauncher.toString());
+        	int nb = me.getNumberOfAgentsInRole(str+i, WarAgentType.WarRocketLauncher.toString());
         	while(nb!=0) {
         		i++;
-        		nb = me.getNumberOfAgentsInRole(str+i, Role.RocketLauncher.toString());
+        		nb = me.getNumberOfAgentsInRole(str+i, WarAgentType.WarRocketLauncher.toString());
         	}
-        	me.requestRole(str+i, Role.RocketLauncher.toString());
+        	me.requestRole(str+i, WarAgentType.WarRocketLauncher.toString());
         	
         	me.ctask=MoveToExplorer;
         	

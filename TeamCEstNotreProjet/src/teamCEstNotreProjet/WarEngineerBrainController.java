@@ -20,7 +20,7 @@ public abstract class WarEngineerBrainController extends WarEngineerBrain {
 
     public WarEngineerBrainController() {
         super();
-        ctask = waitForMessage;
+        ctask = chooseRole;
         nbTick=-1;
         target="none";
     }
@@ -145,6 +145,20 @@ public abstract class WarEngineerBrainController extends WarEngineerBrain {
     			return WarEngineer.ACTION_TAKE;
     		}
     	}
+    };
+    
+    static WTask chooseRole = new WTask(){
+        String exec(WarBrain bc)
+        {
+        	
+        	WarEngineerBrainController me = (WarEngineerBrainController) bc;
+           
+        	me.requestRole(WarAgentType.WarEngineer.toString(), WarAgentType.WarEngineer.toString());
+        	
+        	me.ctask=waitForMessage;
+        	
+        	return me.ctask.exec(me);
+        }
     };
     
     private WarMessage getMessageAboutFood() {

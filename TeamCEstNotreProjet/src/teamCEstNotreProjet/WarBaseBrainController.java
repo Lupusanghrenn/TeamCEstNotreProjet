@@ -1,7 +1,11 @@
 package teamCEstNotreProjet;
 
 import edu.warbot.agents.agents.WarBase;
+import edu.warbot.agents.agents.WarEngineer;
 import edu.warbot.agents.agents.WarExplorer;
+import edu.warbot.agents.agents.WarHeavy;
+import edu.warbot.agents.agents.WarKamikaze;
+import edu.warbot.agents.agents.WarLight;
 import edu.warbot.agents.enums.WarAgentCategory;
 import edu.warbot.agents.enums.WarAgentType;
 import edu.warbot.agents.percepts.WarAgentPercept;
@@ -18,7 +22,7 @@ public abstract class WarBaseBrainController extends WarBaseBrain {
     
     public WTask ctask;
     Sorted_Percepts sp;
-    HashMap<Group,Integer> nbAgentPerGroup;
+    HashMap<WarAgentType,Integer> nbAgentPerType;
     HashMap<Group,Integer> desiredNbAgentPerRole;
 
     public WarBaseBrainController() {
@@ -26,10 +30,12 @@ public abstract class WarBaseBrainController extends WarBaseBrain {
         _inDanger = false;
         this.ctask=firstTick;
         //init de la hasmMap
-        nbAgentPerGroup = new HashMap<Group,Integer>();
-        for(Group g : Group.values()) {
-        	nbAgentPerGroup.put(g, 0);
-        }
+        nbAgentPerType = new HashMap<WarAgentType,Integer>();
+        this.nbAgentPerType.put(WarAgentType.WarEngineer, 0);
+        this.nbAgentPerType.put(WarAgentType.WarExplorer, 0);
+        this.nbAgentPerType.put(WarAgentType.WarHeavy, 0);
+        this.nbAgentPerType.put(WarAgentType.WarRocketLauncher, 0);
+        this.nbAgentPerType.put(WarAgentType.WarTurret, 0);
     }
     
     @Override
@@ -139,13 +145,11 @@ public abstract class WarBaseBrainController extends WarBaseBrain {
     
     private void updateAgentInGroup() {
     	//Mis a jour de la hashMap
-    	for(Group g : Group.values()) {
-    		int nb = 0;
-    		for(Role r :Role.values()) {
-    			nb+=this.getNumberOfAgentsInRole(g.toString(), r.toString());
-    		}
-    		this.nbAgentPerGroup.put(g, nb);    		   		
-    	}
-    }
+    	this.nbAgentPerType.put(WarAgentType.WarEngineer, this.getNumberOfAgentsInRole(WarAgentType.WarEngineer.toString(), WarAgentType.WarEngineer.toString()));
+        this.nbAgentPerType.put(WarAgentType.WarExplorer, this.getNumberOfAgentsInRole(WarAgentType.WarExplorer.toString(), WarAgentType.WarExplorer.toString()));
+        this.nbAgentPerType.put(WarAgentType.WarHeavy, this.getNumberOfAgentsInRole(WarAgentType.WarHeavy.toString(), WarAgentType.WarHeavy.toString()));
+        this.nbAgentPerType.put(WarAgentType.WarRocketLauncher, this.getNumberOfAgentsInRole(WarAgentType.WarRocketLauncher.toString(), WarAgentType.WarRocketLauncher.toString()));
+        this.nbAgentPerType.put(WarAgentType.WarTurret, this.getNumberOfAgentsInRole(WarAgentType.WarTurret.toString(), WarAgentType.WarTurret.toString()));
+    	    }
 
 }

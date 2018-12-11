@@ -25,6 +25,7 @@ public abstract class WarTurretBrainController extends WarTurretBrain {
     private WarAgentPercept oldPercept;
     private HashMap<WarAgentType,Double> speedByAgentType;
     private double defaultSpeed=1d;//si unite non dans la hasmmap --> normalement impossible
+    boolean firstTick;
 
     public WarTurretBrainController() {
         super();
@@ -39,12 +40,16 @@ public abstract class WarTurretBrainController extends WarTurretBrain {
         this.speedByAgentType.put(WarAgentType.WarRocketLauncher, WarRocketLauncher.SPEED);
         this.speedByAgentType.put(WarAgentType.WarRocket, WarRocket.SPEED);
         this.speedByAgentType.put(WarAgentType.WarTurret, 0d);
+        firstTick=true;
         //stocker toutes les vitesses --> possibement utilise WarAgentType.values et getClass.Speed
         _sight = 0;
     }
 
     @Override
     public String action() {
+    	if(this.firstTick==false) {
+    		this.requestRole(WarAgentType.WarTurret.toString(), WarAgentType.WarTurret.toString());
+    	}
 
         
         Sorted_Percepts sp = new Sorted_Percepts(getPercepts(),this.getTeamName());
@@ -59,22 +64,6 @@ public abstract class WarTurretBrainController extends WarTurretBrain {
             }
             setHeading(_sight);
         }
-        
-//        else if(p!=null && isEnemy(p) && oldPercept!=null){ //Tour de detection
-//            if(p.getAngle()==oldPercept.getAngle() && p.getDistance()==oldPercept.getDistance()) {
-//                double angle = setHeadingRocket(p,WarRocket.SPEED);
-//                
-//                
-//                //ennemi is idle --> besoin de getDistance() ???
-//                this.setHeading(angle);
-//                
-//                //this.setHeading(p.getAngle());
-//                if (isReloaded()) {
-//                  return WarTurret.ACTION_FIRE;
-//                } else{
-//                  return WarTurret.ACTION_RELOAD;
-//                }
-//            }
         else {
                 //double ratio = 2.0*(p.getDistance()/50d);
                 double speed=this.defaultSpeed;
@@ -92,8 +81,6 @@ public abstract class WarTurretBrainController extends WarTurretBrain {
                     if (isReloaded()) {
                         return WarTurret.ACTION_FIRE;
                     }
-                //PolarCoordinates test = this.getTargetedAgentPosition(p.getAngle(), p.getDistance(), p.getHeading(), speed*ratio);
-                //this.setHeading(test.getAngle());
                 
                 else{
                   return WarTurret.ACTION_RELOAD;
@@ -141,22 +128,6 @@ public abstract class WarTurretBrainController extends WarTurretBrain {
                 }
             }
         }
-        
-        //else
-//      {
-//          for(int i = 0;i<WarShell.AUTONOMY;i++)
-//          {
-//              PolarCoordinates blub = getTargetedAgentPosition(p.getAngle(), p.getDistance(), p.getHeading(), s*i);
-//              if(blub.getDistance()/WarShell.SPEED==i)
-//              {
-//                  targetDistance=blub.getDistance();
-//                  angle=blub.getAngle();
-//                  String dbgmsg = Double.toString(angle);
-//                  this.setDebugString(dbgmsg);
-//                  return angle;
-//              }
-//          }
-//      }
         String dbgmsg = Double.toString(angle);
         this.setDebugString(dbgmsg);
         return angle;

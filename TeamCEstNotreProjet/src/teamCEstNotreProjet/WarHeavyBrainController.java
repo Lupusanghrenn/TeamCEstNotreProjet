@@ -231,16 +231,16 @@ public abstract class WarHeavyBrainController extends  WarHeavyBrain {
         	
         	WarHeavyBrainController me = (WarHeavyBrainController) bc;
            
-        	me.requestRole(Group.WarHeavy.toString(), Role.WarHeavy.toString());
+        	me.requestRole(WarAgentType.WarHeavy.toString(), WarAgentType.WarHeavy.toString());
         	
         	String str = "Assault";
         	int i=0;
-        	int nb = me.getNumberOfAgentsInRole(str+i, Role.WarHeavy.toString());
+        	int nb = me.getNumberOfAgentsInRole(str+i, WarAgentType.WarHeavy.toString());
         	while(nb!=0) {
         		i++;
-        		nb = me.getNumberOfAgentsInRole(str+i, Role.WarHeavy.toString());
+        		nb = me.getNumberOfAgentsInRole(str+i, WarAgentType.WarHeavy.toString());
         	}
-        	me.requestRole(str+i, Role.WarHeavy.toString());
+        	me.requestRole(str+i, WarAgentType.WarHeavy.toString());
         	
         	me.ctask=MoveToExplorer;
         	
