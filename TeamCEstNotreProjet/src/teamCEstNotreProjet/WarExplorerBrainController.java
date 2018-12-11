@@ -22,6 +22,7 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 	Sorted_Percepts sp;
 	String target;
 	int nbTick;
+	int nbTickMax;
 	
 	@Override
 	public String action() {
@@ -212,7 +213,7 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 			if(targetRL!=null) {
 				me.setHeading(targetRL.getAngle()+180);
 				me.ctask=kittingEnnemy;
-				me.nbTick=20;
+				me.nbTick=me.nbTickMax;
 				me.broadcastMessageToAgentType(WarAgentType.WarRocketLauncher, ContenuMessage.EnnemyBaseFound.toString(), String.valueOf(targetRL.getDistance()),String.valueOf(targetRL.getAngle()),targetRL.getType().toString());
 				//gerer autre envoi de message
 			}
@@ -220,7 +221,7 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 			if(targetHeavy!=null) {
 				me.setHeading(targetHeavy.getAngle()+180);
 				me.ctask=kittingEnnemy;
-				me.nbTick=20;
+				me.nbTick=me.nbTickMax;
 				me.broadcastMessageToAgentType(WarAgentType.WarHeavy, ContenuMessage.EnnemyBaseFound.toString(), String.valueOf(targetHeavy.getDistance()),String.valueOf(targetHeavy.getAngle()),targetHeavy.getType().toString());
 				//gerer autre envoi de message
 			}
@@ -267,6 +268,7 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 		ctask = chooseRole; // initialisation de la FSM
 		target="start";
 		nbTick=0;
+		nbTickMax=30;//nb de tick pour le kitting
 		//si role = war explorer --> target="none"
 		
 	}   
