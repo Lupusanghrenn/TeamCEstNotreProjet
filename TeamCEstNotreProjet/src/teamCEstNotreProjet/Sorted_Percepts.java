@@ -55,6 +55,7 @@ public class Sorted_Percepts {
 						}else{
 							ennemiBases.add(p);
 						}
+						ennemies.add(p);
 					}else {
 						if(ennemies.size()>0 && ennemies.get(0).getDistance()>p.getDistance()){
 							ennemies.add(0, p);
@@ -132,6 +133,13 @@ public class Sorted_Percepts {
 		return this.ennemiBases;
 	}
 	
+	public WarAgentPercept getClosestEnnemiBase() {
+		if(this.ennemiBases.size()>0) {
+			return this.ennemiBases.get(0);
+		}
+		return null;
+	}
+	
 	public WarAgentPercept getClosestBaseThenEnnemi() {
 		if(ennemiBases.size()>0) {
 			return ennemiBases.get(0);
@@ -144,5 +152,97 @@ public class Sorted_Percepts {
 	
 	public ArrayList<WarAgentPercept> getAllies(){
 		return allies;
+	}
+	
+	public WarAgentPercept getTargetForHeavy() {
+		//prio light > heavy > rocketL > Inge > tourelle > base
+		if(this.ennemies.size()==0) {
+			return null;
+		}
+		
+		for(int i=0;i<this.ennemies.size();i++) {
+			if(this.ennemies.get(i).getType().equals(WarAgentType.WarLight)) {
+				return this.ennemies.get(i);
+			}
+		}
+		
+		for(int i=0;i<this.ennemies.size();i++) {
+			if(this.ennemies.get(i).getType().equals(WarAgentType.WarHeavy)) {
+				return this.ennemies.get(i);
+			}
+		}
+		
+		for(int i=0;i<this.ennemies.size();i++) {
+			if(this.ennemies.get(i).getType().equals(WarAgentType.WarRocketLauncher)) {
+				return this.ennemies.get(i);
+			}
+		}
+		
+		for(int i=0;i<this.ennemies.size();i++) {
+			if(this.ennemies.get(i).getType().equals(WarAgentType.WarEngineer)) {
+				return this.ennemies.get(i);
+			}
+		}
+		
+		for(int i=0;i<this.ennemies.size();i++) {
+			if(this.ennemies.get(i).getType().equals(WarAgentType.WarTurret)) {
+				return this.ennemies.get(i);
+			}
+		}
+		
+		for(int i=0;i<this.ennemies.size();i++) {
+			if(this.ennemies.get(i).getType().equals(WarAgentType.WarBase)) {
+				return this.ennemies.get(i);
+			}
+		}
+		return null;
+		
+		
+	}
+	
+	public WarAgentPercept getTargetForRL() {
+		//prio tourelle > base > RL > Heavy > Light > engi
+		
+		if(this.ennemies.size()==0) {
+			return null;
+		}
+		
+		for(int i=0;i<this.ennemies.size();i++) {
+			if(this.ennemies.get(i).getType().equals(WarAgentType.WarTurret)) {
+				return this.ennemies.get(i);
+			}
+		}
+		
+		for(int i=0;i<this.ennemies.size();i++) {
+			if(this.ennemies.get(i).getType().equals(WarAgentType.WarBase)) {
+				return this.ennemies.get(i);
+			}
+		}
+		
+		for(int i=0;i<this.ennemies.size();i++) {
+			if(this.ennemies.get(i).getType().equals(WarAgentType.WarRocketLauncher)) {
+				return this.ennemies.get(i);
+			}
+		}
+		
+		for(int i=0;i<this.ennemies.size();i++) {
+			if(this.ennemies.get(i).getType().equals(WarAgentType.WarHeavy)) {
+				return this.ennemies.get(i);
+			}
+		}
+		
+		for(int i=0;i<this.ennemies.size();i++) {
+			if(this.ennemies.get(i).getType().equals(WarAgentType.WarLight)) {
+				return this.ennemies.get(i);
+			}
+		}
+		
+		for(int i=0;i<this.ennemies.size();i++) {
+			if(this.ennemies.get(i).getType().equals(WarAgentType.WarEngineer)) {
+				return this.ennemies.get(i);
+			}
+		}
+		return null;
+		
 	}
 }

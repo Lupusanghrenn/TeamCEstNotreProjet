@@ -92,7 +92,6 @@ public abstract class WarEngineerBrainController extends WarEngineerBrain {
 	    		}
 	    		if(me.sp.getBases().size()>0 && me.sp.getClosestBase().getDistance()<me.MAX_DISTANCE_GIVE){
 	    			//set agent to give
-	    			System.out.println("Je recoit");
 	    			me.setDebugString("Je recoit");
 	    			//me.setIdNextAgentToGive(me.sp.getBases().get(0).getID());
 	    			me.sendMessage(me.sp.getClosestBase().getID(), ContenuMessage.GiveToAgent.toString(), me.getID()+"");
@@ -110,7 +109,6 @@ public abstract class WarEngineerBrainController extends WarEngineerBrain {
 	    	
 	    	WarMessage m = me.getMessageFromBase();
 	    	if(m!=null){
-	    		System.out.println("Engineer : Message recu");
 	    		me.target="base";
 	    		//PolarCoordinates pc = me.getTargetedAgentPosition(m.getAngle(), m.getDistance(), Double.parseDouble(m.getContent()[0]), Double.parseDouble(m.getContent()[1]));
 	    		me.setHeading(m.getAngle());

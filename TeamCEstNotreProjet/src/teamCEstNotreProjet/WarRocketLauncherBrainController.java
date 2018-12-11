@@ -26,7 +26,7 @@ public abstract class WarRocketLauncherBrainController extends WarRocketLauncher
     public WarRocketLauncherBrainController() {
         super();
         ctask=MoveToExplorer;
-        
+		//this.requestRole(Group.RocketLauncher.toString(),Role.RocketLauncher.toString());
     }
 
     @Override

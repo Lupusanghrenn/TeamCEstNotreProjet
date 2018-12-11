@@ -1,9 +1,11 @@
 package teamCEstNotreProjet;
 
 import edu.warbot.agents.agents.WarBase;
+import edu.warbot.agents.agents.WarExplorer;
 import edu.warbot.agents.enums.WarAgentCategory;
 import edu.warbot.agents.enums.WarAgentType;
 import edu.warbot.agents.percepts.WarAgentPercept;
+import edu.warbot.brains.WarBrain;
 import edu.warbot.brains.brains.WarBaseBrain;
 import edu.warbot.communications.WarMessage;
 
@@ -11,46 +13,55 @@ import java.util.List;
 
 public abstract class WarBaseBrainController extends WarBaseBrain {
 
-    private boolean _alreadyCreated;
     private boolean _inDanger;
+    
+    public WTask ctask;
+    Sorted_Percepts sp;
 
     public WarBaseBrainController() {
         super();
-
-        _alreadyCreated = false;
         _inDanger = false;
+        this.ctask=firstTick;
     }
-
-
+    
     @Override
-    public String action() {
+	public String action() {
+		
+		// Develop behaviour here
+    	this.sp = new Sorted_Percepts(this.getPercepts(),this.getTeamName());
+    	updateAgentInGroup();//pour savoir le nb d agent
+		
     	
-        if (!_alreadyCreated) {
-            setNextAgentToCreate(WarAgentType.WarEngineer);
-            _alreadyCreated = true;
-            return WarBase.ACTION_CREATE;
-        }
-        
-        Sorted_Percepts sp = new Sorted_Percepts(this.getPercepts(),this.getTeamName());
-        
-        for(WarAgentPercept p : sp.getAllies()){
-        	if(p.getType().equals(WarAgentType.WarEngineer) && p.getDistance()<WarBase.MAX_DISTANCE_GIVE){
-        		if(this.getNbElementsInBag()==0){
-        			this.sendMessage(p.getID(), ContenuMessage.NoMoreFood.toString(), "");
-        		}
-        		this.setIdNextAgentToGive(p.getID());
-        		return WarBase.ACTION_GIVE;
-        	}
-        }
-
-        if (getNbElementsInBag() >= 0 && getHealth() <= 0.8 * getMaxHealth())
-            return WarBase.ACTION_EAT;
-
-        if (getMaxHealth() == getHealth()) {
-            _alreadyCreated = true;
-        }
-
-        List<WarMessage> messages = getMessages();
+    	//Message
+    	this.handleMessage();
+    	
+    	
+		String toReturn = ctask.exec(this);   // le run de la FSM
+		
+		return toReturn;
+	}
+    
+    static WTask firstTick = new WTask(){
+		String exec(WarBrain bc){
+			WarBaseBrainController me = (WarBaseBrainController) bc;
+			
+			//Ajout dans les differents role
+			me.requestRole(Group.Base.toString(), Role.Base.toString());
+			me.requestRole(Group.WarExplorer.toString(), Role.Base.toString());
+			me.requestRole(Group.RocketLauncher.toString(), Role.Base.toString());
+			me.requestRole(Group.WarHeavy.toString(), Role.Base.toString());
+			
+			//Creation d un explorer
+			me.setNextAgentToCreate(WarAgentType.WarEngineer);
+			me.ctask=defaultTask;
+            return WarBase.ACTION_CREATE;            
+		}
+    };
+    
+    public void handleMessage() {
+    	//la base repond a tout les messages
+    	
+    	List<WarMessage> messages = getMessages();
 
         for (WarMessage message : messages) {
             if (message.getMessage().equals(ContenuMessage.WhereIsBase.toString()))
@@ -59,22 +70,62 @@ public abstract class WarBaseBrainController extends WarBaseBrain {
             	this.setIdNextAgentToGive(message.getSenderID());
             }
         }
-
-        for (WarAgentPercept percept : sp.getEnnemies()) {
-            if (isEnemy(percept) && percept.getType().getCategory().equals(WarAgentCategory.Soldier))
-                broadcastMessageToAll("I'm under attack",
-                        String.valueOf(percept.getAngle()),
-                        String.valueOf(percept.getDistance()));
-        }
-
-        for (WarAgentPercept percept : getPerceptsResources()) {
-            if (percept.getType().equals(WarAgentType.WarFood))
-                broadcastMessageToAgentType(WarAgentType.WarExplorer, ContenuMessage.FoundFood.toString(),
-                        String.valueOf(percept.getAngle()),
-                        String.valueOf(percept.getDistance()));
-        }
-
-        return WarBase.ACTION_IDLE;
+    }
+    
+    static WTask defaultTask = new WTask(){
+		String exec(WarBrain bc){
+			WarBaseBrainController me = (WarBaseBrainController) bc;
+			
+			if(me.sp.getClosestEnnemi()!=null) {
+	    		//faire une fonction pour les percepts de la base
+	    		me.ctask=underAttack;//reflexes
+	    		return me.ctask.exec(me);
+	    	}
+			
+			for(WarAgentPercept p : me.sp.getAllies()){
+	        	if(p.getType().equals(WarAgentType.WarEngineer) && p.getDistance()<WarBase.MAX_DISTANCE_GIVE){
+	        		if(me.getNbElementsInBag()==0){
+	        			me.sendMessage(p.getID(), ContenuMessage.NoMoreFood.toString(), "");
+	        		}
+	        		me.setIdNextAgentToGive(p.getID());
+	        		return WarBase.ACTION_GIVE;
+	        	}
+	        }
+			
+			for (WarAgentPercept percept : me.sp.getRessources()) {
+	                me.broadcastMessageToGroup("Explorer", ContenuMessage.FoundFood.toString(),String.valueOf(percept.getDistance()),String.valueOf(percept.getAngle()));
+	        }
+			
+			//Gérer le nombre d agent
+			//TODO
+			
+			
+			if (me.getNbElementsInBag() >= 0 && me.getHealth() <= 0.8 * me.getMaxHealth()) {
+	            return WarBase.ACTION_EAT;
+	        }
+            return WarBase.ACTION_IDLE;
+		}
+    };
+    
+    static WTask underAttack = new WTask(){
+		String exec(WarBrain bc){
+			WarBaseBrainController me = (WarBaseBrainController) bc;
+			//action differentes selon roquette ou non
+			//TODO
+			if(me.sp.getClosestRocket()!=null) {
+				//on priorise les rocket
+			}else if(me.sp.getClosestEnnemi()!=null) {
+				
+			}else {
+				//plus d ennemi
+				me.ctask=defaultTask;
+			}
+            return WarBase.ACTION_IDLE;            
+		}
+    };
+    
+    private void updateAgentInGroup() {
+    	//TODO
     }
 
 }
