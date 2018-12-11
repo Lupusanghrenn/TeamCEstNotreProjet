@@ -215,7 +215,7 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 				me.setHeading(targetRL.getAngle()+180);
 				me.ctask=kittingEnnemy;
 				me.nbTick=me.nbTickMax;
-				me.broadcastMessageToAgentType(WarAgentType.WarRocketLauncher, ContenuMessage.EnnemyBaseFound.toString(), String.valueOf(targetRL.getDistance()),String.valueOf(targetRL.getAngle()),targetRL.getType().toString());
+				me.broadcastMessageToAgentType(WarAgentType.WarRocketLauncher, ContenuMessage.TargetSpotted.toString(), String.valueOf(targetRL.getDistance()),String.valueOf(targetRL.getAngle()),targetRL.getType().toString());
 				//gerer autre envoi de message
 			}
 			
@@ -223,7 +223,7 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 				me.setHeading(targetHeavy.getAngle()+180);
 				me.ctask=kittingEnnemy;
 				me.nbTick=me.nbTickMax;
-				me.broadcastMessageToAgentType(WarAgentType.WarHeavy, ContenuMessage.EnnemyBaseFound.toString(), String.valueOf(targetHeavy.getDistance()),String.valueOf(targetHeavy.getAngle()),targetHeavy.getType().toString());
+				me.broadcastMessageToAgentType(WarAgentType.WarHeavy, ContenuMessage.TargetSpotted.toString(), String.valueOf(targetHeavy.getDistance()),String.valueOf(targetHeavy.getAngle()),targetHeavy.getType().toString());
 				//gerer autre envoi de message
 			}
 			
@@ -246,28 +246,25 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 	static WTask chooseRole = new WTask(){
 		String exec(WarBrain bc){
 			WarExplorerBrainController me = (WarExplorerBrainController) bc;
-			me.requestRole(Group.WarExplorer.toString(),"ExplorerFood");
 			int nbInRole = me.getNumberOfAgentsInRole(Group.WarExplorer.toString(),Role.WarExplorerFood.toString());
 			if(nbInRole>4) {
 				//5 exploreurs de bouffe et apres que des war
-				me.leaveRole(Group.WarExplorer.toString(), Role.WarExplorerFood.toString());
 				me.requestRole(Group.WarExplorer.toString(), Role.WarExplorerWar.toString());
 				
 				//on se met dans un groupe d assault
-				me.requestRole(Group.RocketLauncher.toString(), Role.RocketLauncher.toString());
-	        	
 	        	String str = "Assault";
 	        	int i=0;
-	        	int nb = me.getNumberOfAgentsInRole(str+i, Role.RocketLauncher.toString());
+	        	int nb = me.getNumberOfAgentsInRole(str+i, Role.WarExplorerWar.toString());
 	        	while(nb!=0) {
 	        		i++;
-	        		nb = me.getNumberOfAgentsInRole(str+i, Role.RocketLauncher.toString());
+	        		nb = me.getNumberOfAgentsInRole(str+i, Role.WarExplorerWar.toString());
 	        	}
-	        	me.requestRole(str+i, Role.RocketLauncher.toString());
+	        	me.requestRole(str+i, Role.WarExplorerWar.toString());
 	        		        	
 				me.ctask=searchEnnemyBase;
 				System.out.println("Je suis un ExplorerWar");
 			}else {
+				me.requestRole(Group.WarExplorer.toString(),"ExplorerFood");
 				me.ctask=getFoodTask;
 			}
 			return me.ctask.exec(me);
