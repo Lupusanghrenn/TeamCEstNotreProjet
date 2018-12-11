@@ -215,7 +215,7 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 				me.setHeading(targetRL.getAngle()+180);
 				me.ctask=kittingEnnemy;
 				me.nbTick=me.nbTickMax;
-				me.broadcastMessageToAgentType(WarAgentType.WarRocketLauncher, ContenuMessage.EnnemyBaseFound.toString(), String.valueOf(targetRL.getDistance()),String.valueOf(targetRL.getAngle()),targetRL.getType().toString());
+				me.broadcastMessageToAgentType(WarAgentType.WarRocketLauncher, ContenuMessage.TargetSpotted.toString(), String.valueOf(targetRL.getDistance()),String.valueOf(targetRL.getAngle()),targetRL.getType().toString());
 				//gerer autre envoi de message
 			}
 			
@@ -223,7 +223,7 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 				me.setHeading(targetHeavy.getAngle()+180);
 				me.ctask=kittingEnnemy;
 				me.nbTick=me.nbTickMax;
-				me.broadcastMessageToAgentType(WarAgentType.WarHeavy, ContenuMessage.EnnemyBaseFound.toString(), String.valueOf(targetHeavy.getDistance()),String.valueOf(targetHeavy.getAngle()),targetHeavy.getType().toString());
+				me.broadcastMessageToAgentType(WarAgentType.WarHeavy, ContenuMessage.TargetSpotted.toString(), String.valueOf(targetHeavy.getDistance()),String.valueOf(targetHeavy.getAngle()),targetHeavy.getType().toString());
 				//gerer autre envoi de message
 			}
 			
