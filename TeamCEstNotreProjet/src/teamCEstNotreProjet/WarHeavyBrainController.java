@@ -104,7 +104,7 @@ public abstract class WarHeavyBrainController extends  WarHeavyBrain {
             {
 	            me.cptrTarget--; 
             }
-            else if(message!=null)
+            if(message!=null)
             {
             	me.hasTarget=true;
     			me.cptrTarget=me.nbTickBeforeAbandon;
@@ -171,14 +171,18 @@ public abstract class WarHeavyBrainController extends  WarHeavyBrain {
         	{
         		int numMessage = me.getMessageAboutClosestEnemy(); // sinon  un ennemi a été repéré mais ne peut pas etre touché?
         		WarMessage messageClosestEnemy = me.getMessages().get(numMessage);
-        		PolarCoordinates blub=me.getTargetedAgentPosition(messageClosestEnemy.getAngle(), messageClosestEnemy.getDistance(), Double.parseDouble(messageClosestEnemy.getContent()[1]),Double.parseDouble(messageClosestEnemy.getContent()[0]));
-        		me.hasTarget=true;
-        		me.cptrTarget=me.nbTickBeforeAbandon;
-        		double targetAngle= blub.getAngle();
-        		me.setHeading(targetAngle);
-        		if (me.isBlocked())
-                me.setRandomHeading();
-            	return WarHeavyBrainController.ACTION_MOVE;
+        		if(messageClosestEnemy!=null)
+        		{
+        			PolarCoordinates blub=me.getTargetedAgentPosition(messageClosestEnemy.getAngle(), messageClosestEnemy.getDistance(), Double.parseDouble(messageClosestEnemy.getContent()[1]),Double.parseDouble(messageClosestEnemy.getContent()[0]));
+	        		me.hasTarget=true;
+	        		me.cptrTarget=me.nbTickBeforeAbandon;
+	        		double targetAngle= blub.getAngle();
+	        		me.setHeading(targetAngle);
+	        		if (me.isBlocked())
+	                me.setRandomHeading();
+	            	return WarHeavyBrainController.ACTION_MOVE;
+        		}
+      
         	}
         	if(me.cptrTarget<=0)
         	{
@@ -186,8 +190,7 @@ public abstract class WarHeavyBrainController extends  WarHeavyBrain {
         	}
             me.cptrTarget--;
         	return WarHeavyBrainController.ACTION_MOVE;
-            //double targetDistance =Double.parseDouble(message.getContent()[0]);   
-            
+            //double targetDistance =Double.parseDouble(message.getContent()[0]);           
         }
     };
     
