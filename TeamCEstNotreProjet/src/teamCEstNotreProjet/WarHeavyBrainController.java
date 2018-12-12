@@ -81,10 +81,11 @@ public abstract class WarHeavyBrainController extends  WarHeavyBrain {
         String exec(WarBrain bc)
         {
             WarHeavyBrainController me = (WarHeavyBrainController) bc;
-            me.setDebugString(me.targetDirection.getAngle()+"");
-            me.setHeading(me.targetDirection.getAngle());
+
             if(me.sp.getClosestEnnemi()!=null)
             { 	
+                me.setDebugString(me.targetDirection.getAngle()+"");
+                me.setHeading(me.targetDirection.getAngle());
             	me.hasTarget=true;
     			me.cptrTarget=me.nbTickBeforeAbandon;
                 me.targetDirection = new PolarCoordinates(me.sp.getClosestEnnemi().getDistance(),me.sp.getClosestEnnemi().getAngle());
