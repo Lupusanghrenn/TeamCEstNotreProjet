@@ -204,6 +204,8 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 					}
 				}
 				me.broadcastMessageToGroup(myAssaultGroup, ContenuMessage.EnnemyBaseFound.toString(), String.valueOf(targetRL.getDistance()),String.valueOf(targetRL.getAngle()),targetRL.getType().toString());
+				me.ctask=kittingEnnemy;
+				me.setHeading(me.getHeading()+180);
 			}
 			
 			if(targetHeavy!=null) {
@@ -216,6 +218,8 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 					}
 				}
 				me.broadcastMessageToGroup(myAssaultGroup, ContenuMessage.EnnemyBaseFound.toString(), String.valueOf(targetHeavy.getDistance()),String.valueOf(targetHeavy.getAngle()),targetHeavy.getType().toString());
+				me.ctask=kittingEnnemy;
+				me.setHeading(me.getHeading()+180);
 			}
 			
 			
