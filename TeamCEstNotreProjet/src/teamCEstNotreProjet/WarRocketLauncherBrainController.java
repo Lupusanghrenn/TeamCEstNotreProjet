@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.warbot.agents.agents.WarExplorer;
+import edu.warbot.agents.agents.WarHeavy;
 import edu.warbot.agents.agents.WarRocketLauncher;
 import edu.warbot.agents.enums.WarAgentType;
 import edu.warbot.agents.percepts.WarAgentPercept;
@@ -71,7 +72,7 @@ public abstract class WarRocketLauncherBrainController extends WarRocketLauncher
             WarMessage message= me.getMessageAboutEnemiesInRange();
             if(message==null)
             {
-	            me.cptrTarget--; 
+	            me.cptrTarget--;
             }
             else
             {
@@ -105,8 +106,8 @@ public abstract class WarRocketLauncherBrainController extends WarRocketLauncher
         	
         	WarRocketLauncherBrainController me = (WarRocketLauncherBrainController) bc;
            
-         	if(!me.sp.getEnnemies().isEmpty())
-        	{
+         	if(me.sp.getClosestEnnemi()!=null) {
+        		me.targetDirection=new PolarCoordinates(me.sp.getClosestEnnemi().getDistance(),me.sp.getClosestEnnemi().getAngle());
         		me.hasTarget=true;
         		me.cptrTarget=me.nbTickBeforeAbandon;
                 me.ctask=ShootTarget;
@@ -114,8 +115,10 @@ public abstract class WarRocketLauncherBrainController extends WarRocketLauncher
             	return WarRocketLauncherBrainController.ACTION_MOVE;
         	}
         	WarMessage message= me.getMessageAboutEnemiesInRange();    //detecte si des ennemis sont a portée de rocket
-            if(message!=null)
+        	
+            if(message!=null||me.targetDirection.getDistance()<me.rocketDistance)
             {
+        		me.targetDirection=me.getTargetedAgentPosition(message.getAngle(), message.getDistance(), Double.parseDouble(message.getContent()[1]),Double.parseDouble(message.getContent()[0]));
         		me.hasTarget=true;
         		me.cptrTarget=me.nbTickBeforeAbandon;
                 me.ctask=ShootTarget;
@@ -127,21 +130,32 @@ public abstract class WarRocketLauncherBrainController extends WarRocketLauncher
         	{
         		int numMessage = me.getMessageAboutClosestEnemy(); // sinon  un ennemi a été repéré mais ne peut pas etre touché?
         		WarMessage messageClosestEnemy = me.getMessages().get(numMessage);
-        		PolarCoordinates blub=me.getTargetedAgentPosition(messageClosestEnemy.getAngle(), messageClosestEnemy.getDistance(), Double.parseDouble(messageClosestEnemy.getContent()[1]),Double.parseDouble(messageClosestEnemy.getContent()[0]));
+        		me.targetDirection=me.getTargetedAgentPosition(messageClosestEnemy.getAngle(), messageClosestEnemy.getDistance(), Double.parseDouble(messageClosestEnemy.getContent()[1]),Double.parseDouble(messageClosestEnemy.getContent()[0]));
         		me.hasTarget=true;
         		me.cptrTarget=me.nbTickBeforeAbandon;
-        		double targetAngle= blub.getAngle();
+        		double targetAngle= me.targetDirection.getAngle();
         		me.setHeading(targetAngle);
                 me.setTargetDistance(me.rocketDistance);
         		if (me.isBlocked())
                 me.setRandomHeading();
             	return WarRocketLauncherBrainController.ACTION_MOVE;
         	}
+//            if(me.targetDirection.getDistance())
+//            {
+//            	me.setHeading(me.targetDirection.getAngle());
+//	            me.setTargetDistance(me.targetDirection.getDistance());
+//	            if(me.isReloaded()) //si il est rechargé, il tire
+//	            {
+//	                return WarRocketLauncherBrainController.ACTION_FIRE;
+//	            }              	     		                      	
+//	            return WarRocketLauncherBrainController.ACTION_RELOAD;
+//            }
         	if(me.cptrTarget<=0)
         	{
         		me.ctask=MoveToExplorer;
         	}
             me.cptrTarget--;
+        	me.targetDirection.setDistance(me.targetDirection.getDistance()-WarRocketLauncher.SPEED);
         	return WarRocketLauncherBrainController.ACTION_MOVE;
             //double targetDistance =Double.parseDouble(message.getContent()[0]);   
             
@@ -154,9 +168,11 @@ public abstract class WarRocketLauncherBrainController extends WarRocketLauncher
         	WarRocketLauncherBrainController me = (WarRocketLauncherBrainController) bc;
             
             //}
-        	if(!me.sp.getEnnemies().isEmpty())
+        	if(me.sp.getClosestEnnemi()!=null)
         	{
             	//me.setDebugString(message.getContent().toString());
+        		me.targetDirection=new PolarCoordinates(me.sp.getClosestEnnemi().getDistance(),me.sp.getClosestEnnemi().getAngle());
+
                 me.ctask=ShootTarget;
                 me.setHeading(me.sp.getEnnemies().get(0).getAngle());
                 me.setTargetDistance(me.sp.getEnnemies().get(0).getDistance());
@@ -166,6 +182,8 @@ public abstract class WarRocketLauncherBrainController extends WarRocketLauncher
             int numMessage = me.getMessageAboutClosestEnemy(); // sinon  un ennemi a été repéré mais ne peut pas etre touché?
             if(message!=null)
             {
+        		me.targetDirection=me.getTargetedAgentPosition(message.getAngle(), message.getDistance(), Double.parseDouble(message.getContent()[1]),Double.parseDouble(message.getContent()[0]));
+
             	me.setDebugString(message.getContent().toString());
                 me.ctask=ShootTarget;
                 me.setHeading(Double.parseDouble(message.getContent()[1]));
