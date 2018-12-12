@@ -203,9 +203,10 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 						break;
 					}
 				}
-				me.broadcastMessageToGroup(myAssaultGroup, ContenuMessage.EnnemyBaseFound.toString(), String.valueOf(targetRL.getDistance()),String.valueOf(targetRL.getAngle()),targetRL.getType().toString());
+				System.out.println("j'envoie un message au groupe : "+myAssaultGroup);
+				me.broadcastMessageToGroup(myAssaultGroup, ContenuMessage.TargetSpotted.toString(), String.valueOf(targetRL.getDistance()),String.valueOf(targetRL.getAngle()),targetRL.getType().toString());
 				me.ctask=kittingEnnemy;
-				me.setHeading(me.getHeading()+180);
+				me.nbTick=me.nbTickMax;
 			}
 			
 			if(targetHeavy!=null) {
@@ -217,9 +218,10 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 						break;
 					}
 				}
-				me.broadcastMessageToGroup(myAssaultGroup, ContenuMessage.EnnemyBaseFound.toString(), String.valueOf(targetHeavy.getDistance()),String.valueOf(targetHeavy.getAngle()),targetHeavy.getType().toString());
+				System.out.println("j'envoie un message au groupe : "+myAssaultGroup);
+				me.broadcastMessageToGroup(myAssaultGroup, ContenuMessage.TargetSpotted.toString(), String.valueOf(targetHeavy.getDistance()),String.valueOf(targetHeavy.getAngle()),targetHeavy.getType().toString());
 				me.ctask=kittingEnnemy;
-				me.setHeading(me.getHeading()+180);
+				me.nbTick=me.nbTickMax;
 			}
 			
 			
