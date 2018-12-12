@@ -84,11 +84,12 @@ public abstract class WarHeavyBrainController extends  WarHeavyBrain {
 
             if(me.sp.getClosestEnnemi()!=null)
             { 	
-                me.setDebugString(me.targetDirection.getAngle()+"");
+            	me.targetDirection = new PolarCoordinates(me.sp.getClosestEnnemi().getDistance(),me.sp.getClosestEnnemi().getAngle());
+                //me.setDebugString(me.targetDirection.getAngle()+"");
                 me.setHeading(me.targetDirection.getAngle());
             	me.hasTarget=true;
     			me.cptrTarget=me.nbTickBeforeAbandon;
-                me.targetDirection = new PolarCoordinates(me.sp.getClosestEnnemi().getDistance(),me.sp.getClosestEnnemi().getAngle());
+                
                 for (int i=0;i<WarShell.AUTONOMY;i++)
                 {
                     PolarCoordinates blub = me.getTargetedAgentPosition(me.targetDirection.getAngle(), me.targetDirection.getDistance(), me.sp.getClosestEnnemi().getHeading(), i*me.speedByAgentType.get(me.sp.getClosestEnnemi().getType()));
@@ -317,12 +318,13 @@ public abstract class WarHeavyBrainController extends  WarHeavyBrain {
             {   
                 PolarCoordinates blub=getTargetedAgentPosition(getMessages().get(i).getAngle(), getMessages().get(i).getDistance(), Double.parseDouble(getMessages().get(i).getContent()[1]),Double.parseDouble(getMessages().get(i).getContent()[0]));
 
-                if(Math.abs(blub.getDistance()-150)<previousDistance)
+                if(blub.getDistance()<previousDistance)
                 {
                     previousDistance=blub.getDistance();
+                    m=this.getMessages().get(i);
                 }
-                m=this.getMessages().get(0);
-                System.out.println("message recu Heayvy");
+               
+                //System.out.println("message recu Heayvy");
             }
         }
         return m;
