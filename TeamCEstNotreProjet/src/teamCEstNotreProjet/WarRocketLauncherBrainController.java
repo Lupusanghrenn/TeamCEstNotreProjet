@@ -59,7 +59,7 @@ public abstract class WarRocketLauncherBrainController extends WarRocketLauncher
             {
             	me.hasTarget=true;
     			me.cptrTarget=me.nbTickBeforeAbandon;
-                me.targetDirection = new PolarCoordinates(me.sp.getEnnemies().get(0).getDistance(),me.sp.getClosestEnnemi().getAngle());
+                me.targetDirection = new PolarCoordinates(me.sp.getClosestEnnemi().getDistance(),me.sp.getClosestEnnemi().getAngle());
             
 	            me.setHeading(me.targetDirection.getAngle());
 	            me.setTargetDistance(me.targetDirection.getDistance());
@@ -135,8 +135,7 @@ public abstract class WarRocketLauncherBrainController extends WarRocketLauncher
         			me.targetDirection=me.getTargetedAgentPosition(messageClosestEnnemi.getAngle(), messageClosestEnnemi.getDistance(), Double.parseDouble(messageClosestEnnemi.getContent()[1]),Double.parseDouble(messageClosestEnnemi.getContent()[0]));
 	        		me.hasTarget=true;
 	        		me.cptrTarget=me.nbTickBeforeAbandon;
-	        		double targetAngle= me.targetDirection.getAngle();
-	        		me.setHeading(targetAngle);
+	        		me.setHeading(me.targetDirection.getAngle());
 	        		if (me.isBlocked())
 	                me.setRandomHeading();
 	            	return WarRocketLauncherBrainController.ACTION_MOVE;
@@ -150,7 +149,6 @@ public abstract class WarRocketLauncherBrainController extends WarRocketLauncher
         	me.targetDirection.setDistance(me.targetDirection.getDistance()-WarRocketLauncher.SPEED);
             me.cptrTarget--;
         	return WarRocketLauncherBrainController.ACTION_MOVE;
-            //double targetDistance =Double.parseDouble(message.getContent()[0]);    
         }
     };
     
@@ -164,7 +162,6 @@ public abstract class WarRocketLauncherBrainController extends WarRocketLauncher
         	{
             	//me.setDebugString(message.getContent().toString());
         		me.targetDirection=new PolarCoordinates(me.sp.getClosestEnnemi().getDistance(),me.sp.getClosestEnnemi().getAngle());
-
                 me.ctask=ShootTarget;
                 me.setHeading(me.sp.getEnnemies().get(0).getAngle());
                 me.setTargetDistance(me.sp.getEnnemies().get(0).getDistance());
@@ -175,8 +172,6 @@ public abstract class WarRocketLauncherBrainController extends WarRocketLauncher
             if(message!=null)
             {
         		me.targetDirection=me.getTargetedAgentPosition(message.getAngle(), message.getDistance(), Double.parseDouble(message.getContent()[1]),Double.parseDouble(message.getContent()[0]));
-
-            	me.setDebugString(message.getContent().toString());
                 me.ctask=ShootTarget;
                 me.setHeading(Double.parseDouble(message.getContent()[1]));
                 me.setTargetDistance(me.rocketDistance);
@@ -185,7 +180,8 @@ public abstract class WarRocketLauncherBrainController extends WarRocketLauncher
             else if(messageClosestEnemy!=null) // c'est oui
             {
         		me.targetDirection=me.getTargetedAgentPosition(messageClosestEnemy.getAngle(), messageClosestEnemy.getDistance(), Double.parseDouble(messageClosestEnemy.getContent()[1]),Double.parseDouble(messageClosestEnemy.getContent()[0]));
-                me.ctask=MoveToTarget;
+            	me.cptrTarget=me.nbTickBeforeAbandon;
+        		me.ctask=MoveToTarget;
             }
             if (me.isBlocked())
                 me.setRandomHeading();
@@ -255,9 +251,9 @@ public abstract class WarRocketLauncherBrainController extends WarRocketLauncher
     
     private Boolean isTargetInRange(WarMessage m)
     { 
-        PolarCoordinates blub= getTargetedAgentPosition(m.getAngle(), m.getDistance(), Double.parseDouble(m.getContent()[1]),Double.parseDouble(m.getContent()[0]));
+    	PolarCoordinates blub= getTargetedAgentPosition(m.getAngle(), m.getDistance(), Double.parseDouble(m.getContent()[1]),Double.parseDouble(m.getContent()[0]));  
         
-        if((blub.getDistance()<rocketDistance+WarBomb.EXPLOSION_RADIUS))
+        if((blub.getDistance()<rocketDistance))
         {
             return true;
         }
