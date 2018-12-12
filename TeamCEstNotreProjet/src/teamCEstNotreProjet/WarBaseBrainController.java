@@ -24,6 +24,7 @@ public abstract class WarBaseBrainController extends WarBaseBrain {
     Sorted_Percepts sp;
     HashMap<WarAgentType,Integer> nbAgentPerType;
     HashMap<Group,Integer> desiredNbAgentPerRole;
+    int minHealth;
 
     public WarBaseBrainController() {
         super();
@@ -36,6 +37,15 @@ public abstract class WarBaseBrainController extends WarBaseBrain {
         this.nbAgentPerType.put(WarAgentType.WarHeavy, 0);
         this.nbAgentPerType.put(WarAgentType.WarRocketLauncher, 0);
         this.nbAgentPerType.put(WarAgentType.WarTurret, 0);
+        desiredNbAgentPerRole = new HashMap<Group,Integer>();
+
+        this.desiredNbAgentPerRole.put(Group.FoodExplorer, 5);
+        this.desiredNbAgentPerRole.put(Group.WarExplorer, 5);
+        this.desiredNbAgentPerRole.put(Group.WarTurret, 5);
+        this.desiredNbAgentPerRole.put(Group.WarHeavy, 5);
+        this.desiredNbAgentPerRole.put(Group.RocketLauncher, 5);
+        this.desiredNbAgentPerRole.put(Group.Engineer, 1);
+        minHealth=4000;
     }
     
     @Override
@@ -67,13 +77,14 @@ public abstract class WarBaseBrainController extends WarBaseBrain {
 			
 			//Creation d un ingenieur
 			me.setNextAgentToCreate(WarAgentType.WarEngineer);
+			
 			me.ctask=defaultTask;
             return WarBase.ACTION_CREATE;            
 		}
     };
     
     public void handleMessage() {
-    	//la base repond a tout les messages
+    	//la base repond a tous les messages
     	
     	List<WarMessage> messages = getMessages();
 
@@ -112,9 +123,32 @@ public abstract class WarBaseBrainController extends WarBaseBrain {
 			
 			//Gérer le nombre d agent
 			//TODO
+			if(me.getHealth()>me.minHealth)
+			{
+				if(me.nbAgentPerType.get(WarAgentType.WarTurret)<5)
+				{
+					me.setNextAgentToCreate(WarAgentType.WarTurret);
+				}
+				else if (me.nbAgentPerType.get(WarAgentType.WarEngineer)<me.desiredNbAgentPerRole.get(Group.Engineer))
+				{
+					me.setNextAgentToCreate(WarAgentType.WarEngineer);
+				}
+				else if (me.nbAgentPerType.get(WarAgentType.WarExplorer)<me.desiredNbAgentPerRole.get(Group.FoodExplorer)+me.desiredNbAgentPerRole.get(Group.WarExplorer) )
+				{
+					me.setNextAgentToCreate(WarAgentType.WarExplorer);
+				}
+				else if (me.nbAgentPerType.get(WarAgentType.WarHeavy)<me.desiredNbAgentPerRole.get(Group.WarHeavy))
+				{
+					me.setNextAgentToCreate(WarAgentType.WarHeavy);
+				}
+				else if (me.nbAgentPerType.get(WarAgentType.WarRocketLauncher)<me.desiredNbAgentPerRole.get(Group.RocketLauncher))
+				{
+					me.setNextAgentToCreate(WarAgentType.WarRocketLauncher);
+				}
+				return WarBase.ACTION_CREATE;
+			}
 			
-			
-			if (me.getNbElementsInBag() >= 0 && me.getHealth() <= 0.8 * me.getMaxHealth()) {
+			if (me.getNbElementsInBag() >= 0 && me.getHealth() < 0.95*me.getMaxHealth()) {
 	            return WarBase.ACTION_EAT;
 	        }
             return WarBase.ACTION_IDLE;

@@ -5,5 +5,8 @@ public enum Group {
 	Base,
 	RocketLauncher,
 	WarHeavy,
-	WarLight
+	WarLight,
+	FoodExplorer,
+	WarTurret,
+	Engineer
 }
