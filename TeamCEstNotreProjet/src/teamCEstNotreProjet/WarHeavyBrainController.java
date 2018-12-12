@@ -2,6 +2,7 @@ package teamCEstNotreProjet;
 
 import java.util.HashMap;
 
+import edu.warbot.agents.agents.WarBase;
 import edu.warbot.agents.agents.WarEngineer;
 import edu.warbot.agents.agents.WarExplorer;
 import edu.warbot.agents.agents.WarHeavy;
@@ -158,13 +159,7 @@ public abstract class WarHeavyBrainController extends  WarHeavyBrain {
         	WarHeavyBrainController me = (WarHeavyBrainController) bc;
         	me.setDebugString("MoveToTarget");
 	
-//        	if(me.sp.getClosestEnnemi()!=null)
-//        	{
-//        		me.hasTarget=true;
-//        		me.cptrTarget=me.nbTickBeforeAbandon;
-//                me.ctask=ShootTarget;
-//            	return WarHeavyBrainController.ACTION_MOVE;
-//        	}
+
         	WarMessage message= me.getMessageAboutEnemiesInRange();    //detecte si des ennemis sont a portée de rocket
             if(message!=null||me.sp.getClosestEnnemi()!=null)
             {
@@ -258,12 +253,34 @@ public abstract class WarHeavyBrainController extends  WarHeavyBrain {
     
     static WTask DefendBase = new WTask(){
         String exec(WarBrain bc)
-        {
-        	
+        {   	
         	WarHeavyBrainController me = (WarHeavyBrainController) bc;
-           return "";
+        	if(me.followMessage.getMessage().equals(ContenuMessage.FollowMissile.toString()))
+        	{
+	        	PolarCoordinates blub= me.getTargetedAgentPosition(me.followMessage.getAngle(), me.followMessage.getDistance(), Double.parseDouble(me.followMessage.getContent()[1]), WarBase.DISTANCE_OF_VIEW+20);
+//	        	if(me.followMessage.getDistance()<10)
+//	        	{
+	        		me.setHeading(blub.getAngle());
+	        		me.cptrTarget=70;
+	        		me.ctask=MoveToTarget;
+	        		return WarHeavyBrainController.ACTION_MOVE;
+	        	//}
+//	        	me.setHeading(me.followMessage.getAngle());
+//	        	return WarHeavyBrainController.ACTION_MOVE;
+        	}
+        	else if(me.followMessage.getMessage().equals(ContenuMessage.BaseUnderAttack.toString()))
+        	{
+	        	PolarCoordinates blub= me.getTargetedAgentPosition(me.followMessage.getAngle(), me.followMessage.getDistance(), Double.parseDouble(me.followMessage.getContent()[1]), Double.parseDouble(me.followMessage.getContent()[0]));
+        		me.setHeading(blub.getAngle());
+        		me.cptrTarget=70;
+        		me.ctask=MoveToTarget;
+        		return WarHeavyBrainController.ACTION_MOVE;
+        	}
+    		return WarHeavyBrainController.ACTION_MOVE;
         }
     };
+
+    
     
     
     private WarMessage getMessageAboutEnemiesInRange() {
@@ -314,7 +331,7 @@ public abstract class WarHeavyBrainController extends  WarHeavyBrain {
     
     private boolean gotFollowMissileMessage() {
     	for(WarMessage m :this.getMessages()) {
-    		if(m.getMessage().equals(ContenuMessage.FollowMissile.toString())) {
+    		if(m.getMessage().equals(ContenuMessage.FollowMissile.toString())||m.getMessage().equals(ContenuMessage.BaseUnderAttack.toString())) {
     			this.followMessage=m;
     			return true;
     		}

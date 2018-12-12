@@ -24,6 +24,7 @@ public abstract class WarBaseBrainController extends WarBaseBrain {
     Sorted_Percepts sp;
     HashMap<WarAgentType,Integer> nbAgentPerType;
     HashMap<Group,Integer> desiredNbAgentPerRole;
+    int nbTicksAttack;
     int minHealth;
     int nbMaxTick;
     int cptTick;
@@ -40,7 +41,7 @@ public abstract class WarBaseBrainController extends WarBaseBrain {
         this.nbAgentPerType.put(WarAgentType.WarRocketLauncher, 0);
         this.nbAgentPerType.put(WarAgentType.WarTurret, 0);
         desiredNbAgentPerRole = new HashMap<Group,Integer>();
-
+        nbTicksAttack=-1;
         this.desiredNbAgentPerRole.put(Group.FoodExplorer, 5);
         this.desiredNbAgentPerRole.put(Group.WarExplorer, 5);
         this.desiredNbAgentPerRole.put(Group.WarTurret, 5);
@@ -185,19 +186,27 @@ public abstract class WarBaseBrainController extends WarBaseBrain {
 			WarBaseBrainController me = (WarBaseBrainController) bc;
 			//action differentes selon roquette ou non
 			//TODO
-			if(me.sp.getClosestRocket()!=null) {
+			
+			if(me.nbTicksAttack<=0)
+			{
+				me.nbTicksAttack=10;
+				me.setDebugString("help!");
+				if(me.sp.getClosestRocket()!=null) {
 				//on priorise les rocket
-				WarAgentPercept p = me.sp.getClosestRocket();
-				me.broadcastMessageToAgentType(WarAgentType.WarHeavy, ContenuMessage.FollowMissile.toString(), String.valueOf(p.getDistance()),String.valueOf(p.getAngle()),String.valueOf(p.getHeading()+180));
-				me.broadcastMessageToAgentType(WarAgentType.WarLight, ContenuMessage.FollowMissile.toString(), String.valueOf(p.getDistance()),String.valueOf(p.getAngle()),String.valueOf(p.getHeading()+180));
-			}else if(me.sp.getClosestEnnemi()!=null) {
-				WarAgentPercept p = me.sp.getClosestEnnemi();
-				me.broadcastMessageToAgentType(WarAgentType.WarHeavy, ContenuMessage.BaseUnderAttack.toString(), String.valueOf(p.getDistance()),String.valueOf(p.getAngle()));
-				me.broadcastMessageToAgentType(WarAgentType.WarLight, ContenuMessage.BaseUnderAttack.toString(), String.valueOf(p.getDistance()),String.valueOf(p.getAngle()));
-			}else {
+					
+					WarAgentPercept p = me.sp.getClosestRocket();
+					me.broadcastMessageToAgentType(WarAgentType.WarHeavy, ContenuMessage.FollowMissile.toString(), String.valueOf(p.getDistance()),String.valueOf(p.getAngle()),String.valueOf(p.getHeading()+180));
+					me.broadcastMessageToAgentType(WarAgentType.WarLight, ContenuMessage.FollowMissile.toString(), String.valueOf(p.getDistance()),String.valueOf(p.getAngle()),String.valueOf(p.getHeading()+180));
+				}else if(me.sp.getClosestEnnemi()!=null) {
+					WarAgentPercept p = me.sp.getClosestEnnemi();
+					me.broadcastMessageToAgentType(WarAgentType.WarHeavy, ContenuMessage.BaseUnderAttack.toString(), String.valueOf(p.getDistance()),String.valueOf(p.getAngle()));
+					me.broadcastMessageToAgentType(WarAgentType.WarLight, ContenuMessage.BaseUnderAttack.toString(), String.valueOf(p.getDistance()),String.valueOf(p.getAngle()));
+				}else {
 				//plus d ennemi
-				me.ctask=defaultTask;
+					me.ctask=defaultTask;
+				}
 			}
+			me.nbTicksAttack--;
             return WarBase.ACTION_IDLE;            
 		}
     };
