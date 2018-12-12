@@ -81,7 +81,7 @@ public abstract class WarHeavyBrainController extends  WarHeavyBrain {
         String exec(WarBrain bc)
         {
             WarHeavyBrainController me = (WarHeavyBrainController) bc;
-            me.setDebugString("ShootTarget");
+            me.setDebugString(me.targetDirection.getAngle()+"");
             me.setHeading(me.targetDirection.getAngle());
             if(me.sp.getClosestEnnemi()!=null)
             { 	

@@ -118,6 +118,7 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 		    			me.broadcastMessageToGroup(WarAgentType.WarExplorer.toString(),  ContenuMessage.EnnemyBaseFound.toString(), msgcnt,msgcnt1,msgcnt2 );
 		    		}
 		    	}
+		    	me.setHeading(me.getHeading()+180);
 	    	}
 			
 			if(me.isBagFull()){
@@ -221,7 +222,7 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 			//Attente des messages
 			WarMessage m = me.getMessageAboutBase();
 			if(m!=null) {
-				System.out.println("ExplorerWar : Message recu!");
+				//System.out.println("ExplorerWar : Message recu!");
 				PolarCoordinates pc = me.getTargetedAgentPosition(m.getAngle(), m.getDistance(), Double.parseDouble(m.getContent()[0]), Double.parseDouble(m.getContent()[1]));
 				me.setHeading(pc.getAngle());
 				me.target="searching";
