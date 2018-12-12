@@ -123,7 +123,7 @@ public abstract class WarBaseBrainController extends WarBaseBrain {
 			
 			//Gérer le nombre d agent
 			//TODO
-			if(me.getHealth()>me.minHealth)
+			if(me.getHealth()>me.minHealth && me.getNbElementsInBag()>8)
 			{
 				
 				//prio inge puis  explo puis assaultTeam
