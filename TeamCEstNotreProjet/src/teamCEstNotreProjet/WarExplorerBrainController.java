@@ -108,14 +108,14 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 	    	if(!me.sp.getEnnemies().isEmpty())
 	    	{
 		    	//me.setDebugString(me.sp.getEnnemies().get(0).toString());
-		    	for(int i=0; i<me.sp.getEnnemies().size();i++)
+		    	for(int i=0; i<me.sp.getEnnemiBases().size();i++)
 		    	{
 		    		if(!me.sp.getEnnemies().isEmpty())
 		    		{
-		    			String msgcnt = Double.toString(me.sp.getClosestEnnemi().getDistance());
-		    			String msgcnt1=	Double.toString(me.sp.getClosestEnnemi().getAngle());
-		    			String msgcnt2 = me.sp.getClosestEnnemi().getType().toString();
-		    			me.broadcastMessageToGroup(WarAgentType.WarExplorer.toString(),  ContenuMessage.TargetSpotted.toString(), msgcnt,msgcnt1,msgcnt2 );
+		    			String msgcnt = Double.toString(me.sp.getEnnemiBases().get(0).getDistance());
+		    			String msgcnt1=	Double.toString(me.sp.getEnnemiBases().get(0).getAngle());
+		    			String msgcnt2 = me.sp.getEnnemiBases().get(0).getType().toString();
+		    			me.broadcastMessageToGroup(WarAgentType.WarExplorer.toString(),  ContenuMessage.EnnemyBaseFound.toString(), msgcnt,msgcnt1,msgcnt2 );
 		    		}
 		    	}
 	    	}
@@ -132,32 +132,7 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 			me.setDebugString("Searching food");
 			
 			WarAgentPercept foodPercept = me.sp.getClosestRessources();
-			WarAgentPercept targetRL = me.sp.getTargetForRL();
-			WarAgentPercept targetHeavy = me.sp.getTargetForHeavy();
 			
-			if(targetRL!=null) {
-				me.setHeading(targetRL.getAngle()+180);
-				String myAssaultGroup = "";
-				for(String s : me.myGroups()) {
-					if(s.contains("Assault")) {
-						myAssaultGroup =s;
-						break;
-					}
-				}
-				me.broadcastMessageToGroup(myAssaultGroup, ContenuMessage.EnnemyBaseFound.toString(), String.valueOf(targetRL.getDistance()),String.valueOf(targetRL.getAngle()),targetRL.getType().toString());
-			}
-			
-			if(targetHeavy!=null) {
-				me.setHeading(targetHeavy.getAngle()+180);
-				String myAssaultGroup = "";
-				for(String s : me.myGroups()) {
-					if(s.contains("Assault")) {
-						myAssaultGroup =s;
-						break;
-					}
-				}
-				me.broadcastMessageToGroup(myAssaultGroup, ContenuMessage.EnnemyBaseFound.toString(), String.valueOf(targetHeavy.getDistance()),String.valueOf(targetHeavy.getAngle()),targetHeavy.getType().toString());
-			}
 			
 			//Si il y a de la nouriture
 			if(foodPercept != null){
@@ -210,27 +185,36 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 			me.setDebugString("searchEnnemyBase");
 			
 			//recherche d ennemi
-			WarAgentPercept targetRL = me.sp.getTargetForRL();
-			WarAgentPercept targetHeavy = me.sp.getTargetForHeavy();
 			
 			if(me.isBlocked()){
 				me.setRandomHeading();
 			}
 			
+			WarAgentPercept targetRL = me.sp.getTargetForRL();
+			WarAgentPercept targetHeavy = me.sp.getTargetForHeavy();
+			
 			if(targetRL!=null) {
 				me.setHeading(targetRL.getAngle()+180);
-				me.ctask=kittingEnnemy;
-				me.nbTick=me.nbTickMax;
-				me.broadcastMessageToAgentType(WarAgentType.WarRocketLauncher, ContenuMessage.TargetSpotted.toString(), String.valueOf(targetRL.getDistance()),String.valueOf(targetRL.getAngle()),targetRL.getType().toString());
-				//gerer autre envoi de message
+				String myAssaultGroup = "";
+				for(String s : me.myGroups()) {
+					if(s.contains("Assault")) {
+						myAssaultGroup =s;
+						break;
+					}
+				}
+				me.broadcastMessageToGroup(myAssaultGroup, ContenuMessage.EnnemyBaseFound.toString(), String.valueOf(targetRL.getDistance()),String.valueOf(targetRL.getAngle()),targetRL.getType().toString());
 			}
 			
 			if(targetHeavy!=null) {
 				me.setHeading(targetHeavy.getAngle()+180);
-				me.ctask=kittingEnnemy;
-				me.nbTick=me.nbTickMax;
-				me.broadcastMessageToAgentType(WarAgentType.WarHeavy, ContenuMessage.TargetSpotted.toString(), String.valueOf(targetHeavy.getDistance()),String.valueOf(targetHeavy.getAngle()),targetHeavy.getType().toString());
-				//gerer autre envoi de message
+				String myAssaultGroup = "";
+				for(String s : me.myGroups()) {
+					if(s.contains("Assault")) {
+						myAssaultGroup =s;
+						break;
+					}
+				}
+				me.broadcastMessageToGroup(myAssaultGroup, ContenuMessage.EnnemyBaseFound.toString(), String.valueOf(targetHeavy.getDistance()),String.valueOf(targetHeavy.getAngle()),targetHeavy.getType().toString());
 			}
 			
 			
