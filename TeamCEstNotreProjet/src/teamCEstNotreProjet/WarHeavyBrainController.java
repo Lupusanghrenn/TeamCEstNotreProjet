@@ -32,6 +32,7 @@ public abstract class WarHeavyBrainController extends  WarHeavyBrain {
     PolarCoordinates targetDirection;
     double shellDistance=WarShell.AUTONOMY*WarShell.SPEED;
     private HashMap<WarAgentType,Double> speedByAgentType;
+    WarMessage followMessage;
 
 
     public WarHeavyBrainController() {
@@ -52,14 +53,19 @@ public abstract class WarHeavyBrainController extends  WarHeavyBrain {
         hasTarget =false;
         cptrTarget=0;
         nbTickBeforeAbandon=70;
+        followMessage=null;
     }
 
     @Override
     public String action() {
 
     	this.sp = new Sorted_Percepts(this.getPercepts(),this.getTeamName());
-    	this.setDebugString(sp.getEnnemies().toString());
-        String toReturn = ctask.exec(this);   // le run de la FSM
+    	
+    	if(this.gotFollowMissileMessage()) {
+        	ctask=DefendBase;
+        }
+    	
+    	String toReturn = ctask.exec(this);   // le run de la FSM
         
         if(toReturn == null){
             if (isBlocked())
@@ -256,9 +262,19 @@ public abstract class WarHeavyBrainController extends  WarHeavyBrain {
         	
         	WarHeavyBrainController me = (WarHeavyBrainController) bc;
         	PolarCoordinates blub= me.getTargetedAgentPosition(me.followMessage.getAngle(), me.followMessage.getDistance(), Double.parseDouble(me.followMessage.getContent()[1]), Double.parseDouble(me.followMessage.getContent()[0]));
+        	if(me.followMessage.getDistance()<10)
+        	{
+        		me.setHeading(Double.parseDouble(me.followMessage.getContent()[2]));
+        		me.ctask=MoveToTarget;
+        		return WarHeavyBrainController.ACTION_MOVE;
+        	}
+        	me.setHeading(me.followMessage.getAngle());
         	return WarHeavyBrainController.ACTION_MOVE;
         }
     };
+
+    
+    
     
     private WarMessage getMessageAboutEnemiesInRange() {
         for (WarMessage m : getMessages())
@@ -305,6 +321,17 @@ public abstract class WarHeavyBrainController extends  WarHeavyBrain {
         }
         return false;
     }
-
     
+    private boolean gotFollowMissileMessage() {
+    	for(WarMessage m :this.getMessages()) {
+    		if(m.getMessage().equals(ContenuMessage.FollowMissile.toString())) {
+    			this.followMessage=m;
+    			return true;
+    		}
+    	}
+    	
+    	return false;
+    }
+
+
 }
