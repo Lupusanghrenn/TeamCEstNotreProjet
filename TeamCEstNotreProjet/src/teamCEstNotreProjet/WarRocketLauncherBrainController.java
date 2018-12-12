@@ -9,6 +9,7 @@ import edu.warbot.agents.agents.WarRocketLauncher;
 import edu.warbot.agents.enums.WarAgentType;
 import edu.warbot.agents.percepts.WarAgentPercept;
 import edu.warbot.agents.projectiles.WarBomb;
+import edu.warbot.agents.projectiles.WarRocket;
 import edu.warbot.brains.WarBrain;
 import edu.warbot.brains.brains.WarRocketLauncherBrain;
 import edu.warbot.communications.WarMessage;
@@ -22,11 +23,12 @@ public abstract class WarRocketLauncherBrainController extends WarRocketLauncher
     int cptrTarget;
     int nbTickBeforeAbandon;
     PolarCoordinates targetDirection;
-    double rocketDistance=WarBomb.AUTONOMY*WarBomb.SPEED;
+    double rocketDistance=WarRocket.AUTONOMY*WarRocket.SPEED;
 
     public WarRocketLauncherBrainController() {
         super();
         ctask=chooseRole;
+        //this.setTargetDistance(rocketDistance);
 		//this.requestRole(Group.RocketLauncher.toString(),Role.RocketLauncher.toString());
     }
 
@@ -53,11 +55,11 @@ public abstract class WarRocketLauncherBrainController extends WarRocketLauncher
         {
         	WarRocketLauncherBrainController me = (WarRocketLauncherBrainController) bc;
     		
-        	if(!me.sp.getEnnemies().isEmpty())
+        	if(me.sp.getClosestEnnemi()!=null)
             {
             	me.hasTarget=true;
     			me.cptrTarget=me.nbTickBeforeAbandon;
-                me.targetDirection = new PolarCoordinates(me.sp.getEnnemies().get(0).getDistance(),me.sp.getEnnemies().get(0).getAngle());
+                me.targetDirection = new PolarCoordinates(me.sp.getEnnemies().get(0).getDistance(),me.sp.getClosestEnnemi().getAngle());
             
 	            me.setHeading(me.targetDirection.getAngle());
 	            me.setTargetDistance(me.targetDirection.getDistance());
@@ -65,37 +67,46 @@ public abstract class WarRocketLauncherBrainController extends WarRocketLauncher
 	            {
 	                return WarRocketLauncherBrainController.ACTION_FIRE;
 	            }              	     		                      	
-	            return WarRocketLauncherBrainController.ACTION_RELOAD;          
-	            
+	            return WarRocketLauncherBrainController.ACTION_RELOAD;               
             }
         	
             WarMessage message= me.getMessageAboutEnemiesInRange();
-            if(message==null)
+            if(message==null&&me.sp.getClosestEnnemi()==null&&me.cptrTarget>0)
             {
 	            me.cptrTarget--;
+	            me.setHeading(me.targetDirection.getAngle());
+	            me.setTargetDistance(me.targetDirection.getDistance());
+	            if(me.isReloaded()) //si il est rechargé, il tire
+	            {	
+	                return WarHeavyBrainController.ACTION_FIRE;
+	            }     		           
+	            return WarHeavyBrainController.ACTION_RELOAD;
             }
-            else
+            if(message!=null)
             {
             	me.hasTarget=true;
     			me.cptrTarget=me.nbTickBeforeAbandon;
                 me.targetDirection = me.getTargetedAgentPosition(message.getAngle(), message.getDistance(), Double.parseDouble(message.getContent()[1]),Double.parseDouble(message.getContent()[0]));
+            
+                me.setHeading(me.targetDirection.getAngle());
+                me.setTargetDistance(me.targetDirection.getDistance());
+	            if(me.isReloaded()) //si il est rechargé, il tire
+	            {	
+	                return WarHeavyBrainController.ACTION_FIRE;
+	            }     		           
+	            return WarHeavyBrainController.ACTION_RELOAD;  
             }
-            me.setHeading(me.targetDirection.getAngle());
-            me.setTargetDistance(me.targetDirection.getDistance());
-
-            if(me.isReloaded()) //si il est rechargé, il tire
+            //me.setHeading(me.targetDirection.getAngle());
+            if(!me.isReloaded()) //si il est rechargé, il tire
             {
-                return WarRocketLauncherBrainController.ACTION_FIRE;
+                return WarHeavyBrainController.ACTION_RELOAD;
             }
             if(me.cptrTarget<=0)
             {
             	me.ctask = MoveToExplorer;
             }
-            if(!me.isReloaded())
-            {        		           
-            	return WarRocketLauncherBrainController.ACTION_RELOAD;          
-            }
-            return WarRocketLauncherBrainController.ACTION_MOVE;     
+
+            return WarHeavyBrainController.ACTION_MOVE;      
         }
         
     };
