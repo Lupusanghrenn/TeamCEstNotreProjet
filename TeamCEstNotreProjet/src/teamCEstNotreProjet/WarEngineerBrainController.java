@@ -124,12 +124,12 @@ public abstract class WarEngineerBrainController extends WarEngineerBrain {
     		WarEngineerBrainController me = (WarEngineerBrainController) bc;
     		me.setDebugString("healFromBase");
     		
-    		List<WarMessage> lMes = me.getMessages();
+    		/*List<WarMessage> lMes = me.getMessages();
     		for(WarMessage m : lMes){
     			if(m.getMessage().equals(ContenuMessage.NoMoreFood.toString())){
     				me.ctask=waitForMessage;
     			}
-    		}
+    		}*/
     		
     		
     		if(me.getHealth()==me.getMaxHealth() && me.isBagFull()){
@@ -146,6 +146,7 @@ public abstract class WarEngineerBrainController extends WarEngineerBrain {
     		}
     	}
     };
+    
     
     static WTask chooseRole = new WTask(){
         String exec(WarBrain bc)
