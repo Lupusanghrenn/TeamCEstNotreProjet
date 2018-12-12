@@ -321,7 +321,7 @@ public abstract class WarHeavyBrainController extends  WarHeavyBrain {
                     previousDistance=blub.getDistance();
                 }
                 m=this.getMessages().get(0);
-                
+                System.out.println("message recu Heayvy");
             }
         }
         return m;
