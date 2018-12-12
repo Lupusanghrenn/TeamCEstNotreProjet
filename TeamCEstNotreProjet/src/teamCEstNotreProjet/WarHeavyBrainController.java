@@ -113,7 +113,7 @@ public abstract class WarHeavyBrainController extends  WarHeavyBrain {
                 for (int i=0;i<WarShell.AUTONOMY;i++)
                 {
                     PolarCoordinates blub = me.getTargetedAgentPosition(me.targetDirection.getAngle(), me.targetDirection.getDistance(),Double.parseDouble(message.getContent()[1]) , i*me.speedByAgentType.get(WarAgentType.valueOf(message.getContent()[2])));
-                    if((blub.getDistance()<WarShell.SPEED&&i==0)||me.sp.getClosestEnnemi().getType()==WarAgentType.WarTurret||WarAgentType.valueOf(message.getContent()[2])==WarAgentType.WarBase)
+                    if((blub.getDistance()<WarShell.SPEED&&i==0)||WarAgentType.valueOf(message.getContent()[2])==WarAgentType.WarTurret||WarAgentType.valueOf(message.getContent()[2])==WarAgentType.WarBase)
                     {
                         me.setHeading(me.targetDirection.getAngle());
                         break;
