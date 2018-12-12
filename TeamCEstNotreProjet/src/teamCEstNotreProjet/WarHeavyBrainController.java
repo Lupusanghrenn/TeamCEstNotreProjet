@@ -250,6 +250,15 @@ public abstract class WarHeavyBrainController extends  WarHeavyBrain {
         }
     };
     
+    static WTask DefendBase = new WTask(){
+        String exec(WarBrain bc)
+        {
+        	
+        	WarHeavyBrainController me = (WarHeavyBrainController) bc;
+        	PolarCoordinates blub= me.getTargetedAgentPosition(me.followMessage.getAngle(), me.followMessage.getDistance(), Double.parseDouble(me.followMessage.getContent()[1]), Double.parseDouble(me.followMessage.getContent()[0]));
+        	return WarHeavyBrainController.ACTION_MOVE;
+        }
+    };
     
     private WarMessage getMessageAboutEnemiesInRange() {
         for (WarMessage m : getMessages())
@@ -297,5 +306,5 @@ public abstract class WarHeavyBrainController extends  WarHeavyBrain {
         return false;
     }
 
-
+    
 }
