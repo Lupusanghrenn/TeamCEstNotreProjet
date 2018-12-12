@@ -32,6 +32,7 @@ public abstract class WarHeavyBrainController extends  WarHeavyBrain {
     PolarCoordinates targetDirection;
     double shellDistance=WarShell.AUTONOMY*WarShell.SPEED;
     private HashMap<WarAgentType,Double> speedByAgentType;
+    WarMessage followMessage;
 
 
     public WarHeavyBrainController() {
@@ -52,14 +53,19 @@ public abstract class WarHeavyBrainController extends  WarHeavyBrain {
         hasTarget =false;
         cptrTarget=0;
         nbTickBeforeAbandon=70;
+        followMessage=null;
     }
 
     @Override
     public String action() {
 
     	this.sp = new Sorted_Percepts(this.getPercepts(),this.getTeamName());
-    	this.setDebugString(sp.getEnnemies().toString());
-        String toReturn = ctask.exec(this);   // le run de la FSM
+    	
+    	if(this.gotFollowMissileMessage()) {
+        	ctask=DefendBase;
+        }
+    	
+    	String toReturn = ctask.exec(this);   // le run de la FSM
         
         if(toReturn == null){
             if (isBlocked())
@@ -250,6 +256,15 @@ public abstract class WarHeavyBrainController extends  WarHeavyBrain {
         }
     };
     
+    static WTask DefendBase = new WTask(){
+        String exec(WarBrain bc)
+        {
+        	
+        	WarHeavyBrainController me = (WarHeavyBrainController) bc;
+           return "";
+        }
+    };
+    
     
     private WarMessage getMessageAboutEnemiesInRange() {
         for (WarMessage m : getMessages())
@@ -295,6 +310,17 @@ public abstract class WarHeavyBrainController extends  WarHeavyBrain {
             return true;
         }
         return false;
+    }
+    
+    private boolean gotFollowMissileMessage() {
+    	for(WarMessage m :this.getMessages()) {
+    		if(m.getMessage().equals(ContenuMessage.FollowMissile.toString())) {
+    			this.followMessage=m;
+    			return true;
+    		}
+    	}
+    	
+    	return false;
     }
 
 
