@@ -104,20 +104,20 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 				
 			}
 			
-//	    	if(!me.sp.getEnnemies().isEmpty())
-//	    	{
-//		    	//me.setDebugString(me.sp.getEnnemies().get(0).toString());
-//		    	for(int i=0; i<me.sp.getEnnemies().size();i++)
-//		    	{
-//		    		if(!me.sp.getEnnemies().isEmpty())
-//		    		{
-//		    			String msgcnt = Double.toString(me.sp.getClosestEnnemi().getDistance());
-//		    			String msgcnt1=	Double.toString(me.sp.getClosestEnnemi().getAngle());
-//		    			String msgcnt2 = me.sp.getClosestEnnemi().getType().toString();
-//		    			me.broadcastMessageToAll( ContenuMessage.TargetSpotted.toString(), msgcnt,msgcnt1,msgcnt2 );
-//		    		}
-//		    	}
-//	    	}
+	    	if(!me.sp.getEnnemies().isEmpty())
+	    	{
+		    	//me.setDebugString(me.sp.getEnnemies().get(0).toString());
+		    	for(int i=0; i<me.sp.getEnnemies().size();i++)
+		    	{
+		    		if(!me.sp.getEnnemies().isEmpty())
+		    		{
+		    			String msgcnt = Double.toString(me.sp.getClosestEnnemi().getDistance());
+		    			String msgcnt1=	Double.toString(me.sp.getClosestEnnemi().getAngle());
+		    			String msgcnt2 = me.sp.getClosestEnnemi().getType().toString();
+		    			me.broadcastMessageToAll( ContenuMessage.TargetSpotted.toString(), msgcnt,msgcnt1,msgcnt2 );
+		    		}
+		    	}
+	    	}
 			
 			if(me.isBagFull()){
 				me.ctask = returnFoodTask;

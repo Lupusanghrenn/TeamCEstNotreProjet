@@ -25,6 +25,8 @@ public abstract class WarBaseBrainController extends WarBaseBrain {
     HashMap<WarAgentType,Integer> nbAgentPerType;
     HashMap<Group,Integer> desiredNbAgentPerRole;
     int minHealth;
+    int nbMaxTick;
+    int cptTick;
 
     public WarBaseBrainController() {
         super();
@@ -46,6 +48,8 @@ public abstract class WarBaseBrainController extends WarBaseBrain {
         this.desiredNbAgentPerRole.put(Group.RocketLauncher, 5);
         this.desiredNbAgentPerRole.put(Group.Engineer, 1);
         minHealth=4000;
+        nbMaxTick=5;
+        cptTick=0;
     }
     
     @Override
@@ -100,7 +104,7 @@ public abstract class WarBaseBrainController extends WarBaseBrain {
     static WTask defaultTask = new WTask(){
 		String exec(WarBrain bc){
 			WarBaseBrainController me = (WarBaseBrainController) bc;
-			
+			me.cptTick++;
 			if(me.sp.getClosestEnnemi()!=null) {
 	    		//faire une fonction pour les percepts de la base
 	    		me.ctask=underAttack;//reflexes
@@ -123,7 +127,7 @@ public abstract class WarBaseBrainController extends WarBaseBrain {
 			
 			//Gérer le nombre d agent
 			//TODO
-			if(me.getHealth()>me.minHealth && me.getNbElementsInBag()>8)
+			if(me.getHealth()>me.minHealth && me.getNbElementsInBag()>8 && me.cptTick>me.nbMaxTick)
 			{
 				
 				//prio inge puis  explo puis assaultTeam
@@ -131,11 +135,13 @@ public abstract class WarBaseBrainController extends WarBaseBrain {
 				{
 					me.setNextAgentToCreate(WarAgentType.WarEngineer);
 					System.out.println("creation d un agent engi");
+					me.cptTick=0;
 					return WarBase.ACTION_CREATE;
 				}else if(me.nbAgentPerType.get(WarAgentType.WarExplorer)<me.desiredNbAgentPerRole.get(Group.FoodExplorer))
 				{
 					me.setNextAgentToCreate(WarAgentType.WarExplorer);
 					System.out.println("creation d un agent Explorer Food");
+					me.cptTick=0;
 					return WarBase.ACTION_CREATE;
 				}else {
 					int nbTeam=0;
@@ -145,18 +151,21 @@ public abstract class WarBaseBrainController extends WarBaseBrain {
 						if(nbExploInTeam==0) {
 							me.setNextAgentToCreate(WarAgentType.WarExplorer);
 							System.out.println("creation d un agent Explorer War");
+							me.cptTick=0;
 							return WarBase.ACTION_CREATE;
 						}
 						int nbHeavyInTeam = me.getNumberOfAgentsInRole(str+nbTeam, WarAgentType.WarHeavy.toString());
 						if(nbHeavyInTeam==0) {
 							me.setNextAgentToCreate(WarAgentType.WarHeavy);
 							System.out.println("creation d un agent Heavy");
+							me.cptTick=0;
 							return WarBase.ACTION_CREATE;
 						}
 						int nbRLInTeam = me.getNumberOfAgentsInRole(str+nbTeam, WarAgentType.WarRocketLauncher.toString());
 						if(nbRLInTeam==0) {
 							me.setNextAgentToCreate(WarAgentType.WarRocketLauncher);
 							System.out.println("creation d un agent RL");
+							me.cptTick=0;
 							return WarBase.ACTION_CREATE;
 						}
 						nbTeam++;
