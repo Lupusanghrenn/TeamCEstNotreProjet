@@ -29,13 +29,6 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 		
 		// Develop behaviour here
     	this.sp = new Sorted_Percepts(this.getPercepts(),this.getTeamName());
-		
-    	
-    	//a enlever plus tard 
-
-    	
-
-    	
     	
 		String toReturn = ctask.exec(this);   // le run de la FSM
 		
@@ -247,8 +240,8 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 		String exec(WarBrain bc){
 			WarExplorerBrainController me = (WarExplorerBrainController) bc;
 			me.requestRole(WarAgentType.WarExplorer.toString(), WarAgentType.WarExplorer.toString());
-			int nbInRole = me.getNumberOfAgentsInRole(WarAgentType.WarExplorer.toString(),Role.WarExplorerFood.toString());
-			if(nbInRole>4) {
+			int nbInRole = me.getNumberOfAgentsInRole(WarAgentType.WarExplorer.toString(),WarAgentType.WarExplorer.toString());
+			if(nbInRole>5) {
 				//5 exploreurs de bouffe et apres que des war
 				me.requestRole(WarAgentType.WarExplorer.toString(), Role.WarExplorerWar.toString());
 				

@@ -51,7 +51,7 @@ public abstract class WarHeavyBrainController extends  WarHeavyBrain {
         ctask=chooseRole;
         hasTarget =false;
         cptrTarget=0;
-        nbTickBeforeAbandon=20;
+        nbTickBeforeAbandon=70;
     }
 
     @Override
@@ -74,6 +74,7 @@ public abstract class WarHeavyBrainController extends  WarHeavyBrain {
         String exec(WarBrain bc)
         {
             WarHeavyBrainController me = (WarHeavyBrainController) bc;
+            me.setDebugString("ShootTarget");
             if(me.sp.getClosestEnnemi()!=null)
             { 	
             	me.hasTarget=true;
@@ -112,7 +113,7 @@ public abstract class WarHeavyBrainController extends  WarHeavyBrain {
                 for (int i=0;i<WarShell.AUTONOMY;i++)
                 {
                     PolarCoordinates blub = me.getTargetedAgentPosition(me.targetDirection.getAngle(), me.targetDirection.getDistance(),Double.parseDouble(message.getContent()[1]) , i*me.speedByAgentType.get(WarAgentType.valueOf(message.getContent()[2])));
-                    if((blub.getDistance()<WarShell.SPEED&&i==0)||me.sp.getClosestEnnemi().getType()==WarAgentType.WarTurret||me.sp.getClosestEnnemi().getType()==WarAgentType.WarBase)
+                    if((blub.getDistance()<WarShell.SPEED&&i==0)||me.sp.getClosestEnnemi().getType()==WarAgentType.WarTurret||WarAgentType.valueOf(message.getContent()[2])==WarAgentType.WarBase)
                     {
                         me.setHeading(me.targetDirection.getAngle());
                         break;
@@ -149,6 +150,7 @@ public abstract class WarHeavyBrainController extends  WarHeavyBrain {
         {
         	
         	WarHeavyBrainController me = (WarHeavyBrainController) bc;
+        	me.setDebugString("MoveToTarget");
 	
 //        	if(me.sp.getClosestEnnemi()!=null)
 //        	{
@@ -165,13 +167,12 @@ public abstract class WarHeavyBrainController extends  WarHeavyBrain {
                 me.ctask=ShootTarget;
             	return WarHeavyBrainController.ACTION_MOVE;
             }
-            if(me.getMessageAboutClosestEnemy()!=-1)
+            if(me.getMessageAboutClosestEnemy()!=null)
         	{
-        		int numMessage = me.getMessageAboutClosestEnemy(); // sinon  un ennemi a été repéré mais ne peut pas etre touché?
-        		WarMessage messageClosestEnemy = me.getMessages().get(numMessage);
-        		if(messageClosestEnemy!=null)
+                WarMessage messageClosestEnnemi = me.getMessageAboutClosestEnemy(); // sinon  un ennemi a été repéré mais ne peut pas etre touché?
+        		if(messageClosestEnnemi!=null)
         		{
-        			PolarCoordinates blub=me.getTargetedAgentPosition(messageClosestEnemy.getAngle(), messageClosestEnemy.getDistance(), Double.parseDouble(messageClosestEnemy.getContent()[1]),Double.parseDouble(messageClosestEnemy.getContent()[0]));
+        			PolarCoordinates blub=me.getTargetedAgentPosition(messageClosestEnnemi.getAngle(), messageClosestEnnemi.getDistance(), Double.parseDouble(messageClosestEnnemi.getContent()[1]),Double.parseDouble(messageClosestEnnemi.getContent()[0]));
 	        		me.hasTarget=true;
 	        		me.cptrTarget=me.nbTickBeforeAbandon;
 	        		double targetAngle= blub.getAngle();
@@ -196,6 +197,7 @@ public abstract class WarHeavyBrainController extends  WarHeavyBrain {
         String exec(WarBrain bc)
         {
         	WarHeavyBrainController me = (WarHeavyBrainController) bc;
+        	me.setDebugString("MoveToExplorer");
             
             //}
         	
@@ -206,8 +208,7 @@ public abstract class WarHeavyBrainController extends  WarHeavyBrain {
                 return WarHeavyBrainController.ACTION_FIRE;
         	}
             WarMessage message= me.getMessageAboutEnemiesInRange();    //detecte si des ennemis sont a portée de rocket
-            int numMessage = me.getMessageAboutClosestEnemy(); // sinon  un ennemi a été repéré mais ne peut pas etre touché?
-            me.setDebugString(Integer.toString(numMessage));
+            WarMessage messageClosestEnnemi = me.getMessageAboutClosestEnemy(); // sinon  un ennemi a été repéré mais ne peut pas etre touché?
             if(message!=null)
             {
             	me.setDebugString(message.getContent().toString());
@@ -215,8 +216,9 @@ public abstract class WarHeavyBrainController extends  WarHeavyBrain {
                 me.setHeading(Double.parseDouble(message.getContent()[1]));
                 return WarHeavyBrainController.ACTION_FIRE;
             }
-            else if(numMessage!=-1) // c'est oui
+            else if(messageClosestEnnemi!=null) // c'est oui
             {
+            	me.cptrTarget=me.nbTickBeforeAbandon;
                 me.ctask=MoveToTarget;
             }
             if (me.isBlocked())
@@ -263,9 +265,9 @@ public abstract class WarHeavyBrainController extends  WarHeavyBrain {
         return null;
     }
     
-    protected int getMessageAboutClosestEnemy() {
+    protected WarMessage getMessageAboutClosestEnemy() {
         double previousDistance =9999;
-        int numMessage=-1;
+        WarMessage m = null;
 
         for (int i =0;i < this.getMessages().size();i++)
         {
@@ -277,12 +279,12 @@ public abstract class WarHeavyBrainController extends  WarHeavyBrain {
                 if(Math.abs(blub.getDistance()-150)<previousDistance)
                 {
                     previousDistance=blub.getDistance();
-                    numMessage=i;
                 }
+                m=this.getMessages().get(0);
                 
             }
         }
-        return numMessage;
+        return m;
     }
     
     private Boolean isTargetInRange(WarMessage m)
