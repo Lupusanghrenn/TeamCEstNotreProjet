@@ -164,7 +164,6 @@ public abstract class WarHeavyBrainController extends  WarHeavyBrain {
         	
         	WarHeavyBrainController me = (WarHeavyBrainController) bc;
         	me.setDebugString("MoveToTarget");
-	
         	me.setHeading(me.targetDirection.getAngle());
         	WarMessage message= me.getMessageAboutEnemiesInRange();    //detecte si des ennemis sont a portée de rocket
             if(message!=null||me.sp.getClosestEnnemi()!=null||me.targetDirection.getDistance()<me.shellDistance)

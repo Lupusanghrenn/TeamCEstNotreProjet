@@ -192,6 +192,8 @@ public abstract class WarRocketLauncherBrainController extends WarRocketLauncher
             }
             else if(numMessage!=-1) // c'est oui
             {
+            	WarMessage messageClosestEnemy = me.getMessages().get(numMessage);
+        		me.targetDirection=me.getTargetedAgentPosition(messageClosestEnemy.getAngle(), messageClosestEnemy.getDistance(), Double.parseDouble(messageClosestEnemy.getContent()[1]),Double.parseDouble(messageClosestEnemy.getContent()[0]));
                 me.ctask=MoveToTarget;
             }
             if (me.isBlocked())
