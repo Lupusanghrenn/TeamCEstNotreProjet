@@ -47,8 +47,9 @@ public abstract class WarTurretBrainController extends WarTurretBrain {
 
     @Override
     public String action() {
-    	if(this.firstTick==false) {
+    	if(this.firstTick==true) {
     		this.requestRole(WarAgentType.WarTurret.toString(), WarAgentType.WarTurret.toString());
+    		firstTick=false;
     	}
 
         

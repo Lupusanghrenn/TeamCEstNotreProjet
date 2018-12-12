@@ -125,27 +125,36 @@ public abstract class WarBaseBrainController extends WarBaseBrain {
 			//TODO
 			if(me.getHealth()>me.minHealth)
 			{
-				if(me.nbAgentPerType.get(WarAgentType.WarTurret)<5)
+				/*if(me.nbAgentPerType.get(WarAgentType.WarTurret)<5)
 				{
 					me.setNextAgentToCreate(WarAgentType.WarTurret);
+					System.out.println("creation d un agent Turret");
+					return WarBase.ACTION_CREATE;
 				}
-				else if (me.nbAgentPerType.get(WarAgentType.WarEngineer)<me.desiredNbAgentPerRole.get(Group.Engineer))
+				else */if (me.nbAgentPerType.get(WarAgentType.WarEngineer)<me.desiredNbAgentPerRole.get(Group.Engineer))
 				{
 					me.setNextAgentToCreate(WarAgentType.WarEngineer);
+					System.out.println("creation d un agent engi");
+					return WarBase.ACTION_CREATE;
 				}
 				else if (me.nbAgentPerType.get(WarAgentType.WarExplorer)<me.desiredNbAgentPerRole.get(Group.FoodExplorer)+me.desiredNbAgentPerRole.get(Group.WarExplorer) )
 				{
 					me.setNextAgentToCreate(WarAgentType.WarExplorer);
+					System.out.println("creation d un agent Explorer");
+					return WarBase.ACTION_CREATE;
 				}
 				else if (me.nbAgentPerType.get(WarAgentType.WarHeavy)<me.desiredNbAgentPerRole.get(Group.WarHeavy))
 				{
 					me.setNextAgentToCreate(WarAgentType.WarHeavy);
+					System.out.println("creation d un agent heavy");
+					return WarBase.ACTION_CREATE;
 				}
 				else if (me.nbAgentPerType.get(WarAgentType.WarRocketLauncher)<me.desiredNbAgentPerRole.get(Group.RocketLauncher))
 				{
 					me.setNextAgentToCreate(WarAgentType.WarRocketLauncher);
+					System.out.println("creation d un agent RL");
+					return WarBase.ACTION_CREATE;
 				}
-				return WarBase.ACTION_CREATE;
 			}
 			
 			if (me.getNbElementsInBag() >= 0 && me.getHealth() < 0.95*me.getMaxHealth()) {
